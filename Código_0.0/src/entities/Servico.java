@@ -1,18 +1,18 @@
 package entities;
 
-public class Animal {
+public class Servico {
 	
 	private Integer id;
 	private String nome;
 	private int idade;
 	
-	public Animal(Integer aId, String aNome, int aIdade) {
+	public Servico(Integer aId, String aNome, int aIdade) {
 		this.id = aId;
 		this.nome = aNome;
 		this.idade = aIdade;
 	}
 	
-	public Animal(String aNome, int aIdade) {
+	public Servico(String aNome, int aIdade) {
 		this(null, aNome, aIdade);
 	}
 
