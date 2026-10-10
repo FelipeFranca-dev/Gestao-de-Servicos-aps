@@ -15,7 +15,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
-import entities.Animal;
+import entities.Servico;
 
 public class PanelTabela extends JPanel{
 	
@@ -24,11 +24,11 @@ public class PanelTabela extends JPanel{
 	private JTable tabela = new JTable(dtm);
 	private JScrollPane scrollPane = new JScrollPane(tabela);
 	
-	private List<Animal> animaisNaTabela;
+	private List<Servico> animaisNaTabela;
 	
 	private JTextField buscaNomeField = new JTextField(20);
 	private JButton buscaNomeButton = new JButton("Busca por Nome");
-	private JButton mostraTodosButton = new JButton("Mostrar Todos");
+	private JButton mostraTodosButton = new JButton("Mostrar TodosS");
 	private JButton apagarButton = new JButton("Apagar");
 	
 	private ActionListener apagarAction;
@@ -52,7 +52,7 @@ public class PanelTabela extends JPanel{
 				JOptionPane.showMessageDialog(PanelTabela.this, "Selecione uma linha da tabela para apagar");
 				return;
 			}
-			Animal a = animaisNaTabela.get(row);
+			Servico a = animaisNaTabela.get(row);
 			int opcao = JOptionPane.showConfirmDialog(PanelTabela.this, "Deseja remover o animal de id " + a.getId() + "?");
 			if(opcao == JOptionPane.YES_OPTION) {
 				apagarAction.actionPerformed(new ActionEvent(apagarButton, 0, ""));
@@ -75,7 +75,7 @@ public class PanelTabela extends JPanel{
 		dtm.setRowCount(0);
 	}
 	
-	void preencheTabela(List<Animal> animais) {
+	void preencheTabela(List<Servico> animais) {
 		animaisNaTabela = animais;
 		
 		limpaTabela();
