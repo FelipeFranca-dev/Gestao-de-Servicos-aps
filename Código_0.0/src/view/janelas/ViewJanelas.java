@@ -9,76 +9,34 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTabbedPane;
 
-import entities.Animal;
+import entities.Servico;
 import view.View;
 
-public class ViewJanelas extends JFrame implements View{
-	
-	PanelAddAnimal panelAddAnimal = new PanelAddAnimal();
-	PanelTabela panelTabela = new PanelTabela();
-	
-	public ViewJanelas(){
-		
-		setLayout(new BorderLayout());
-		
-		JTabbedPane tabPane = new JTabbedPane();
-		add(tabPane);
-		
-		tabPane.add("Adicionar", panelAddAnimal);
-		
-		tabPane.add("Ver Animais", panelTabela);
-		
-		pack();
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setVisible(true);
-		
-	}
-	
-	@Override
-	public void showMessage(String message) {
-		JOptionPane.showMessageDialog(this, message);
-	}
-	
-	
+public class ViewJanelas extends JFrame implements View {
 
-	@Override
-	public void mostraAnimais(List<Animal> animais) {
-		panelTabela.preencheTabela(animais);
-	}
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	public Animal getAnimalFromUserToAdd() throws IOException{
-			return panelAddAnimal.getAnimal();
-	}
+    private PanelAddServicos panelAddServicos =
+            new PanelAddServicos();
 
-	@Override
-	public int getIdAnimalFromUserToRemove() throws IOException {
-		return panelTabela.getIdAnimalFromUserToRemove();
-	}
+    private PanelTabela panelTabela =
+            new PanelTabela();
 
-	@Override
-	public String getAnimalNomeBusca() {
-		return panelTabela.getAnimalNomeBusca();
-	}
+    public ViewJanelas() {
+        setLayout(new BorderLayout());
 
-	@Override
-	public void addAcaoMostraTodosAnimais(ActionListener al) {
-		panelTabela.addAcaoMostraTodosAnimais(al);
-	}
+        JTabbedPane tabPane = new JTabbedPane();
 
-	@Override
-	public void addAcaoBuscaAnimalByNome(ActionListener al) {
-		panelTabela.addAcaoBuscaAnimalByNome(al);
-	}
+        tabPane.addTab("Cadastrar Serviço", panelAddServicos);
+        tabPane.addTab("Agenda de Serviços", panelTabela);
 
-	@Override
-	public void addAcaoAddAnimal(ActionListener al) {
-		panelAddAnimal.addAcaoAddAnimal(al);
-	}
+        add(tabPane, BorderLayout.CENTER);
 
-	@Override
-	public void addAcaoRemoveAnimalById(ActionListener al) {
-		panelTabela.addAcaoRemoveAnimalById(al);
-	}
+        setTitle("Gestão de Serviços");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        pack();
+        setLocationRelativeTo(null);
+        setVisible(true);
+    }
 
 }
