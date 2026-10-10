@@ -28,7 +28,7 @@ public class PanelTabela extends JPanel{
 	
 	private JTextField buscaNomeField = new JTextField(20);
 	private JButton buscaNomeButton = new JButton("Busca por Nome");
-	private JButton mostraTodosButton = new JButton("Mostrar TodosS");
+	private JButton mostraTodosButton = new JButton("Mostrar Todos");
 	private JButton apagarButton = new JButton("Apagar");
 	
 	private ActionListener apagarAction;
