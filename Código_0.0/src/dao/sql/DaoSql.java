@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dao.Dao;
-import entities.Animal;
+import entities.Servico;
 
 public class DaoSql implements Dao{
 	
@@ -31,8 +31,8 @@ public class DaoSql implements Dao{
 
 
 	@Override
-	public List<Animal> getTodosAnimais() {
-		List<Animal> animais = new ArrayList<>();
+	public List<Servico> getTodosAnimais() {
+		List<Servico> animais = new ArrayList<>();
 		
 		final String query = "SELECT * FROM animais"; 
 		
@@ -46,7 +46,7 @@ public class DaoSql implements Dao{
 				int id = rs.getInt("id");
 				String nome = rs.getString("nome");
 				int idade = rs.getInt("idade");
-				animais.add(new Animal(id, nome, idade));
+				animais.add(new Servico(id, nome, idade));
 			}
 			
 		}catch (SQLException e) {
@@ -57,8 +57,8 @@ public class DaoSql implements Dao{
 	}
 
 	@Override
-	public List<Animal> buscaByAnimalNome(String keyNome) {
-		List<Animal> animais = new ArrayList<>();
+	public List<Servico> buscaByAnimalNome(String keyNome) {
+		List<Servico> animais = new ArrayList<>();
 		
 		final String query = "SELECT * FROM animais WHERE nome LIKE(?)"; 
 		
@@ -75,7 +75,7 @@ public class DaoSql implements Dao{
 				int id = rs.getInt("id");
 				String nome = rs.getString("nome");
 				int idade = rs.getInt("idade");
-				animais.add(new Animal(id, nome, idade));
+				animais.add(new Servico(id, nome, idade));
 			}
 			
 		}catch (SQLException e) {
@@ -86,7 +86,7 @@ public class DaoSql implements Dao{
 	}
 
 	@Override
-	public void addAnimal(Animal animal) {
+	public void addAnimal(Servico servico) {
 		final String query = "INSERT INTO animais(nome, idade) VALUES(?, ?)"; 
 		
 		try(
@@ -94,8 +94,8 @@ public class DaoSql implements Dao{
 				PreparedStatement s = c.prepareStatement(query);
 			){
 			
-			s.setString(1, animal.getNome());
-			s.setInt(2, animal.getIdade());
+			s.setString(1, servico.getNome());
+			s.setInt(2, servico.getIdade());
 			
 			int count = s.executeUpdate();
 			System.out.println("" + count + " linhas foram modificadas");

@@ -8,30 +8,30 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import dao.Dao;
-import entities.Animal;
+import entities.Servico;
 
 public class DaoDummy implements Dao{
 	
-	List<Animal> animaisList = Arrays.asList(
-			new Animal(1, "Brutus", 7),
-			new Animal(2, "Mili", 8),
-			new Animal(3, "Chirriro", 9)
+	List<Servico> animaisList = Arrays.asList(
+			new Servico(1, "Brutus", 7),
+			new Servico(2, "Mili", 8),
+			new Servico(3, "Chirriro", 9)
 			);
 	// animais indexados pelo indice
-	Map<Integer, Animal> animais = new TreeMap<>();
+	Map<Integer, Servico> animais = new TreeMap<>();
 	{
 		for(var a: animaisList)
 			animais.put(a.getId(), a);
 	}
 
 	@Override
-	public List<Animal> getTodosAnimais() {
+	public List<Servico> getTodosAnimais() {
 		return new ArrayList<>(animais.values());
 	}
 
 	@Override
-	public List<Animal> buscaByAnimalNome(String keyNome) {
-		List<Animal> resultado = new ArrayList<Animal>();
+	public List<Servico> buscaByAnimalNome(String keyNome) {
+		List<Servico> resultado = new ArrayList<Servico>();
 		for(var a: animais.values())
 			if(a.getNome().toLowerCase().contains(keyNome.toLowerCase()))
 				resultado.add(a);
@@ -39,11 +39,11 @@ public class DaoDummy implements Dao{
 	}
 
 	@Override
-	public void addAnimal(Animal animal) {
+	public void addAnimal(Servico servico) {
 		int newId = Collections.max(animais.keySet());
 		newId++;
-		animal.setId(newId);
-		animais.put(animal.getId(), animal);
+		servico.setId(newId);
+		animais.put(servico.getId(), servico);
 	}
 
 	@Override

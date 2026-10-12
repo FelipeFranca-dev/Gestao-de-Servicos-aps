@@ -2,11 +2,11 @@ package dao;
 
 import java.util.List;
 
-import entities.Animal;
+import entities.Servico;
 
 public interface Dao {
-	List<Animal> getTodosAnimais();
-	List<Animal> buscaByAnimalNome(String keyNome);
-	void addAnimal(Animal animal);
+	List<Servico> getTodosAnimais();
+	List<Servico> buscaByAnimalNome(String keyNome);
+	void addAnimal(Servico servico);
 	void removeAnimalById(int id);
 }

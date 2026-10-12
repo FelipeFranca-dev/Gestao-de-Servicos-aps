@@ -3,31 +3,42 @@ package entities;
 public class Servico {
 	
 	private Integer id;
-	private String nome;
-	private int idade;
+	private String cliente;
+	private String tipo;
+	private double preco;
+	private String status;
 	
-	public Servico(Integer aId, String aNome, int aIdade) {
-		this.id = aId;
-		this.nome = aNome;
-		this.idade = aIdade;
+	public Servico(Integer id, String cliente, String tipo, double preco, String status) {
+		this.id = id;
+		this.cliente = cliente;
+		this.tipo = tipo;
+		this.preco = preco;
+		this.status = status;
 	}
-	
-	public Servico(String aNome, int aIdade) {
-		this(null, aNome, aIdade);
+
+	public Servico(String cliente, String tipo, double preco, String status) {
+		this(null, cliente,tipo, preco,status);
 	}
 
 	public Integer getId() {return id;}
 	public void setId(int id) {this.id = id;}
 	
-	public String getNome() {return nome;}
-	public void setNome(String nome) {this.nome = nome;}
+	public String getCliente() {return cliente;}
+	public void setCliente(String cliente) {this.cliente = cliente;}
 	
-	public int getIdade() {return idade;}
-	public void setIdade(int idade) {this.idade = idade;}
+	public String getTipo() {return tipo;}
+	public void setTipo(String tipo) {this.tipo = tipo;}
+
+	public double getPreco() {return preco;}
+	public void setPreco(double preco) {this.preco = preco;}
+
+	public String getStatus() {return status;}
+	public void setStatus(String status) {this.status = status;}
 
 	@Override
 	public String toString() {
-		return "Animal [id=" + id + ", nome=" + nome + ", idade=" + idade + "]";
+		return "Servico [id=" + id + ", cliente=" + cliente
+				+ ", tipo=" + tipo + ", preco=" + preco
+				+ ", status=" + status + "]";
 	}
-	
 }

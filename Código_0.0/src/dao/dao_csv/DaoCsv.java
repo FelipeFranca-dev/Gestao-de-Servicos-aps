@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import dao.Dao;
-import entities.Animal;
+import entities.Servico;
 
 public class DaoCsv implements Dao{
 	
@@ -30,19 +30,19 @@ public class DaoCsv implements Dao{
 	}
 
 	@Override
-	public List<Animal> getTodosAnimais() {
+	public List<Servico> getTodosAnimais() {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public List<Animal> buscaByAnimalNome(String keyNome) {
+	public List<Servico> buscaByAnimalNome(String keyNome) {
 		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
-	public void addAnimal(Animal animal) {
+	public void addAnimal(Servico servico) {
 		// TODO Auto-generated method stub
 		
 	}
