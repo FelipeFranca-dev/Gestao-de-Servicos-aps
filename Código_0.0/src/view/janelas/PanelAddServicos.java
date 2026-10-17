@@ -4,7 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionListener;
-import java.io.IOException;
+import java.util.List;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -14,39 +14,53 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.table.DefaultTableModel;
-
-import entities.Servico;
 
 public class PanelAddServicos extends JPanel {
 
     private static final long serialVersionUID = 1L;
 
+    // =========================
     // Cliente
-    private JComboBox<String> clienteCombo =
-            new JComboBox<>();
+    // =========================
+
+    private JComboBox<String> clienteCombo = new JComboBox<>();
 
     private JButton novoClienteButton =
-            new JButton("Novo Cliente");
+            new JButton("Novo cliente");
 
-    // Dados do serviço
+    // =========================
+    // Tipo de serviço
+    // =========================
+
     private JComboBox<String> tipoServicoCombo =
-            new JComboBox<>(new String[] {
-                "Pintura",
-                "Instalação elétrica",
-                "Alvenaria",
-            });
+            new JComboBox<>();
+
+    private JButton novoTipoButton =
+            new JButton("Novo tipo");
+
+    // =========================
+    // Endereço do serviço
+    // =========================
+
+    private JComboBox<String> enderecoCombo =
+            new JComboBox<>();
+
+    private JButton novoEnderecoButton =
+            new JButton("Novo endereço");
+
+    // =========================
+    // Dados do serviço
+    // =========================
 
     private JTextField dataField = new JTextField(12);
+
     private JTextField valorField = new JTextField(12);
-    private JTextField enderecoField = new JTextField(25);
 
     private JComboBox<String> statusCombo =
             new JComboBox<>(new String[] {
-                "Orçamento",
+                "Em orçamento",
                 "Agendado",
                 "Em andamento",
                 "Concluído",
@@ -54,129 +68,119 @@ public class PanelAddServicos extends JPanel {
             });
 
     private JTextArea descricaoArea = new JTextArea(3, 25);
+
     private JTextArea observacoesArea = new JTextArea(3, 25);
 
-    // Materiais
-    private JComboBox<String> materialCombo =
-            new JComboBox<>();
 
-    private JTextField quantidadeField =
-            new JTextField(6);
-
-    private JButton adicionarMaterialButton =
-            new JButton("Adicionar");
-
-    private JButton removerMaterialButton =
-            new JButton("Remover selecionado");
-
-    private DefaultTableModel materialModel =
-            new DefaultTableModel(
-                new Object[] {"Material", "Quantidade"}, 0
-            ) {
-                private static final long serialVersionUID = 1L;
-
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-
-    private JTable materiaisTabela =
-            new JTable(materialModel);
-
+    // =========================
     // Ações principais
+    // =========================
+
     private JButton salvarButton =
-            new JButton("Salvar Serviço");
+            new JButton("Cadastrar serviço");
 
     private JButton limparButton =
-            new JButton("Limpar Campos");
+            new JButton("Limpar campos");
+
+    private boolean modoEdicao = false;
+
+    // =========================
+    // Construtor
+    // =========================
 
     public PanelAddServicos() {
+
         setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        setBorder(
+            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+        );
 
         JPanel formulario = new JPanel();
+
         formulario.setLayout(
-                new BoxLayout(formulario, BoxLayout.Y_AXIS)
+            new BoxLayout(formulario, BoxLayout.Y_AXIS)
         );
 
         // 1. Cliente
+
         JPanel clientePanel = criarSecao("Cliente");
-        clientePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        clientePanel.setLayout(
+            new FlowLayout(FlowLayout.LEFT)
+        );
 
         clientePanel.add(new JLabel("Cliente:"));
         clientePanel.add(clienteCombo);
         clientePanel.add(novoClienteButton);
 
-        // 2. Dados do serviço
-        JPanel dadosPanel = criarSecao("Dados do Serviço");
-        dadosPanel.setLayout(new GridLayout(0, 2, 8, 8));
+        // 2. Tipo de serviço
 
-        dadosPanel.add(new JLabel("Tipo de serviço:"));
-        dadosPanel.add(tipoServicoCombo);
+        JPanel tipoPanel = criarSecao("Tipo de serviço");
 
-        dadosPanel.add(new JLabel("Data (dd/mm/aaaa):"));
+        tipoPanel.setLayout(
+            new FlowLayout(FlowLayout.LEFT)
+        );
+
+        tipoPanel.add(new JLabel("Tipo:"));
+        tipoPanel.add(tipoServicoCombo);
+        tipoPanel.add(novoTipoButton);
+
+        // 3. Endereço
+
+        JPanel enderecoPanel = criarSecao(
+            "Endereço do serviço"
+        );
+
+        enderecoPanel.setLayout(
+            new FlowLayout(FlowLayout.LEFT)
+        );
+
+        enderecoPanel.add(new JLabel("Endereço:"));
+        enderecoPanel.add(enderecoCombo);
+        enderecoPanel.add(novoEnderecoButton);
+
+        // 4. Dados gerais
+
+        JPanel dadosPanel = criarSecao("Dados do serviço");
+
+        dadosPanel.setLayout(
+            new GridLayout(0, 2, 8, 8)
+        );
+
+        dadosPanel.add(new JLabel("Data (dd/mm/aa):"));
         dadosPanel.add(dataField);
-
-        dadosPanel.add(new JLabel("Valor (R$):"));
-        dadosPanel.add(valorField);
 
         dadosPanel.add(new JLabel("Status:"));
         dadosPanel.add(statusCombo);
 
-        dadosPanel.add(new JLabel("Endereço do serviço:"));
-        dadosPanel.add(enderecoField);
+        // 6. Observações
 
-        dadosPanel.add(new JLabel("Descrição:"));
-        dadosPanel.add(new JScrollPane(descricaoArea));
+        JPanel observacoesPanel =
+                criarSecao("Observações");
 
-        // 3. Materiais
-        JPanel materiaisPanel = criarSecao("Materiais");
-
-        JPanel adicionarPanel = new JPanel(
-                new FlowLayout(FlowLayout.LEFT)
-        );
-
-        adicionarPanel.add(new JLabel("Material:"));
-        adicionarPanel.add(materialCombo);
-
-        adicionarPanel.add(new JLabel("Quantidade:"));
-        adicionarPanel.add(quantidadeField);
-
-        adicionarPanel.add(adicionarMaterialButton);
-
-        materiaisPanel.add(adicionarPanel, BorderLayout.NORTH);
-        materiaisPanel.add(
-                new JScrollPane(materiaisTabela),
-                BorderLayout.CENTER
-        );
-
-        JPanel removerPanel = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT)
-        );
-
-        removerPanel.add(removerMaterialButton);
-        materiaisPanel.add(removerPanel, BorderLayout.SOUTH);
-
-        // 4. Observações
-        JPanel observacoesPanel = criarSecao("Observações");
-        observacoesPanel.setLayout(new BorderLayout());
         observacoesPanel.add(
-                new JScrollPane(observacoesArea),
-                BorderLayout.CENTER
+            new JScrollPane(observacoesArea),
+            BorderLayout.CENTER
         );
 
-        // Montagem do formulário
+        // Montagem da tela
+
         formulario.add(clientePanel);
+        formulario.add(tipoPanel);
+        formulario.add(enderecoPanel);
         formulario.add(dadosPanel);
-        formulario.add(materiaisPanel);
         formulario.add(observacoesPanel);
 
-        add(new JScrollPane(formulario), BorderLayout.CENTER);
+        add(
+            new JScrollPane(formulario),
+            BorderLayout.CENTER
+        );
 
         // Botões inferiores
+
         JPanel botoesPanel = new JPanel(
-                new FlowLayout(FlowLayout.RIGHT)
+            new FlowLayout(FlowLayout.RIGHT)
         );
 
         botoesPanel.add(limparButton);
@@ -184,92 +188,186 @@ public class PanelAddServicos extends JPanel {
 
         add(botoesPanel, BorderLayout.SOUTH);
 
-        // Adicionar material à lista visual
-        adicionarMaterialButton.addActionListener(e -> {
-            String material =
-                    (String) materialCombo.getSelectedItem();
+        // Ações locais da interface
 
-            String quantidadeTexto =
-                    quantidadeField.getText().trim();
+        limparButton.addActionListener(
+            e -> limparCampos()
+        );
 
-            if (material == null || material.trim().isEmpty()) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Selecione um material."
-                );
-                return;
-            }
+        // Status inicial
 
-            try {
-                double quantidade =
-                        Double.parseDouble(quantidadeTexto);
-
-                if (quantidade <= 0) {
-                    JOptionPane.showMessageDialog(
-                            this,
-                            "A quantidade deve ser maior que zero."
-                    );
-                    return;
-                }
-
-                materialModel.addRow(new Object[] {
-                    material, quantidade
-                });
-
-                quantidadeField.setText("");
-
-            } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Informe uma quantidade válida."
-                );
-            }
-        });
-
-        // Remover material selecionado
-        removerMaterialButton.addActionListener(e -> {
-            int linha = materiaisTabela.getSelectedRow();
-
-            if (linha == -1) {
-                JOptionPane.showMessageDialog(
-                        this,
-                        "Selecione um material da lista."
-                );
-                return;
-            }
-
-            materialModel.removeRow(linha);
-        });
-
-        // Limpar formulário
-        limparButton.addActionListener(e -> limparCampos());
+        statusCombo.setSelectedIndex(0);
     }
 
+    // =========================
+    // Criação de seções
+    // =========================
+
     private JPanel criarSecao(String titulo) {
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
+
+        JPanel panel = new JPanel(
+            new BorderLayout(5, 5)
+        );
 
         panel.setBorder(
-                BorderFactory.createTitledBorder(titulo)
+            BorderFactory.createTitledBorder(titulo)
         );
 
         return panel;
     }
 
+    // =========================
+    // Limpar formulário
+    // =========================
+
     public void limparCampos() {
+
         clienteCombo.setSelectedIndex(-1);
-        tipoServicoCombo.setSelectedIndex(0);
+        tipoServicoCombo.setSelectedIndex(-1);
+        enderecoCombo.setSelectedIndex(-1);
+
         dataField.setText("");
         valorField.setText("");
-        enderecoField.setText("");
+
         statusCombo.setSelectedIndex(0);
+
         descricaoArea.setText("");
         observacoesArea.setText("");
-        materialCombo.setSelectedIndex(-1);
-        quantidadeField.setText("");
-        materialModel.setRowCount(0);
+
+
+        // Mantém a tela pronta para um novo cadastro.
+        setModoEdicao(false);
     }
 
-    // Métodos para conectar os botões ao Controller
+    // =========================
+    // Modo de cadastro / edição
+    // =========================
+
+    public void setModoEdicao(boolean modoEdicao) {
+
+        this.modoEdicao = modoEdicao;
+
+        if (modoEdicao) {
+            salvarButton.setText("Salvar alterações");
+        } else {
+            salvarButton.setText("Cadastrar serviço");
+        }
+    }
+
+    public boolean isModoEdicao() {
+        return modoEdicao;
+    }
+
+    // =========================
+    // Carregamento dos ComboBoxes
+    // =========================
+
+    public void setClientes(List<String> clientes) {
+        preencherCombo(clienteCombo, clientes);
+    }
+
+    public void setTiposServico(List<String> tipos) {
+        preencherCombo(tipoServicoCombo, tipos);
+    }
+
+    public void setEnderecos(List<String> enderecos) {
+        preencherCombo(enderecoCombo, enderecos);
+    }
+
+    private void preencherCombo(
+            JComboBox<String> combo, List<String> itens) {
+
+        combo.removeAllItems();
+
+        if (itens == null) {
+            return;
+        }
+
+        for (String item : itens) {
+
+            if (item != null && !item.isBlank()) {
+                combo.addItem(item);
+            }
+        }
+
+        combo.setSelectedIndex(-1);
+    }
+
+    // Permite adicionar uma nova opção após
+    // o cadastro feito em uma janela auxiliar.
+
+    public void adicionarClienteNaLista(String cliente) {
+        adicionarOpcao(clienteCombo, cliente);
+    }
+
+    public void adicionarTipoNaLista(String tipo) {
+        adicionarOpcao(tipoServicoCombo, tipo);
+    }
+
+    public void adicionarEnderecoNaLista(String endereco) {
+        adicionarOpcao(enderecoCombo, endereco);
+    }
+
+
+    private void adicionarOpcao(
+            JComboBox<String> combo, String opcao) {
+
+        if (opcao == null || opcao.isBlank()) {
+            return;
+        }
+
+        for (int i = 0; i < combo.getItemCount(); i++) {
+
+            if (opcao.equalsIgnoreCase(combo.getItemAt(i))) {
+                combo.setSelectedIndex(i);
+                return;
+            }
+        }
+
+        combo.addItem(opcao);
+        combo.setSelectedItem(opcao);
+    }
+
+    // =========================
+    // Mensagens de validação
+    // =========================
+
+    public void mostrarErro(String mensagem) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            mensagem,
+            "Erro",
+            JOptionPane.ERROR_MESSAGE
+        );
+    }
+
+    public void mostrarMensagem(String mensagem) {
+
+        JOptionPane.showMessageDialog(
+            this,
+            mensagem,
+            "Informação",
+            JOptionPane.INFORMATION_MESSAGE
+        );
+    }
+
+    public boolean confirmar(String mensagem) {
+
+        int resposta = JOptionPane.showConfirmDialog(
+            this,
+            mensagem,
+            "Confirmar operação",
+            JOptionPane.YES_NO_OPTION,
+            JOptionPane.QUESTION_MESSAGE
+        );
+
+        return resposta == JOptionPane.YES_OPTION;
+    }
+
+    // =========================
+    // Conectar botões ao Controller
+    // =========================
 
     public void addAcaoSalvarServico(ActionListener al) {
         salvarButton.addActionListener(al);
@@ -279,7 +377,17 @@ public class PanelAddServicos extends JPanel {
         novoClienteButton.addActionListener(al);
     }
 
-    // Métodos para o Controller consultar os campos
+    public void addAcaoNovoTipo(ActionListener al) {
+        novoTipoButton.addActionListener(al);
+    }
+
+    public void addAcaoNovoEndereco(ActionListener al) {
+        novoEnderecoButton.addActionListener(al);
+    }
+
+    // =========================
+    // Getters para o Controller
+    // =========================
 
     public String getClienteSelecionado() {
         return (String) clienteCombo.getSelectedItem();
@@ -289,16 +397,16 @@ public class PanelAddServicos extends JPanel {
         return (String) tipoServicoCombo.getSelectedItem();
     }
 
+    public String getEndereco() {
+        return (String) enderecoCombo.getSelectedItem();
+    }
+
     public String getData() {
         return dataField.getText().trim();
     }
 
     public String getValor() {
         return valorField.getText().trim();
-    }
-
-    public String getEndereco() {
-        return enderecoField.getText().trim();
     }
 
     public String getStatus() {
@@ -313,7 +421,4 @@ public class PanelAddServicos extends JPanel {
         return observacoesArea.getText().trim();
     }
 
-    public DefaultTableModel getMaterialModel() {
-        return materialModel;
-    }
 }
