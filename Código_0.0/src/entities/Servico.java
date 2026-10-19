@@ -1,6 +1,11 @@
 package entities;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
 public class Servico {
+
+	public static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	
 	private Integer id;
 	private String cliente;
