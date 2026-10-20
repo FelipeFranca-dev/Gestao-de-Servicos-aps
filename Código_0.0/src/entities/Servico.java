@@ -10,19 +10,23 @@ public class Servico {
 	private Integer id;
 	private String cliente;
 	private String tipo;
-	private double preco;
+	private String endereco;
+	private LocalDate data;
 	private String status;
-	
-	public Servico(Integer id, String cliente, String tipo, double preco, String status) {
+	private String observacoes;
+
+	public Servico(Integer id, String cliente, String tipo, String endereco,LocalDate data, String status, String observacoes) {
 		this.id = id;
 		this.cliente = cliente;
 		this.tipo = tipo;
-		this.preco = preco;
+		this.endereco = endereco;
+		this.data = data;
 		this.status = status;
+		this.observacoes = observacoes;
 	}
 
-	public Servico(String cliente, String tipo, double preco, String status) {
-		this(null, cliente,tipo, preco,status);
+	public Servico(String cliente, String tipo, String endereco,LocalDate data, String status, String observacoes) {
+		this(null, cliente, tipo, endereco, data, status, observacoes);
 	}
 
 	public Integer getId() {return id;}
@@ -34,16 +38,23 @@ public class Servico {
 	public String getTipo() {return tipo;}
 	public void setTipo(String tipo) {this.tipo = tipo;}
 
-	public double getPreco() {return preco;}
-	public void setPreco(double preco) {this.preco = preco;}
+	public String getEndereco() {return endereco;}
+	public void setEndereco(String endereco) {this.endereco = endereco;}
+
+	public LocalDate getData() {return data;}
+	public void setData(LocalDate data) {this.data = data;}
 
 	public String getStatus() {return status;}
 	public void setStatus(String status) {this.status = status;}
 
+	public String getObservacoes() {return observacoes;}
+	public void setObservacoes(String observacoes) {this.observacoes = observacoes;}
+
 	@Override
 	public String toString() {
 		return "Servico [id=" + id + ", cliente=" + cliente
-				+ ", tipo=" + tipo + ", preco=" + preco
-				+ ", status=" + status + "]";
+				+ ", tipo=" + tipo + ", endereco=" + endereco
+				+ ", data=" + data + ", status=" + status
+				+ ", observacoes=" + observacoes + "]";
 	}
 }
