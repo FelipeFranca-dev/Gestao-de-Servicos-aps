@@ -10,15 +10,19 @@ public class Servico {
 	private Integer id;
 	private String cliente;
 	private String tipo;
-	private double preco;
+	private String endereco;
+	private LocalDate data;
 	private String status;
-	
-	public Servico(Integer id, String cliente, String tipo, double preco, String status) {
+	private String observacoes;
+
+	public Servico(Integer id, String cliente, String tipo, String endereco, String status,LocalDate data, String observacoes) {
 		this.id = id;
 		this.cliente = cliente;
 		this.tipo = tipo;
-		this.preco = preco;
+		this.endereco = endereco;
+		this.data = data;
 		this.status = status;
+		this.observacoes = observacoes;
 	}
 
 	public Servico(String cliente, String tipo, double preco, String status) {
