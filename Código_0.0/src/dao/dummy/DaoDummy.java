@@ -61,7 +61,7 @@ public class DaoDummy implements Dao {
 	public List<String> getTiposServicos() {
 		// Tipos padrão sempre disponíveis + os que já existem nos serviços
 		TreeSet<String> tipos = new TreeSet<>(Arrays.asList(
-				"Pintura", "Alvenaria", "Instalação elétrica", "Hidráulica"));
+				"Pintura", "Alvenaria", "Instalação elétrica", "Hidráulica", "Jardinagem"));
 		for (Servico s : servicos.values()) {
 			if (s.getTipo() != null && !s.getTipo().isEmpty()) {
 				tipos.add(s.getTipo());
