@@ -5,8 +5,9 @@ import java.util.List;
 import entities.Servico;
 
 public interface Dao {
-	List<Servico> getTodosAnimais();
-	List<Servico> buscaByAnimalNome(String keyNome);
-	void addAnimal(Servico servico);
-	void removeAnimalById(int id);
+    List<Servico> getTodosServicos();
+    List<Servico> buscaByCliente(String nomeCliente);
+    void addServico(Servico servico);
+    void removeServicoById(int id);
+    List<String> getTiposServicos();
 }

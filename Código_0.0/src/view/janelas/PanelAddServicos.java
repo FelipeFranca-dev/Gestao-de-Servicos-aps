@@ -22,24 +22,23 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 public class PanelAddServicos extends JPanel {
-
     private static final long serialVersionUID = 1L;
 
-    // Cliente
+    // cria os elementos principais, sendo o cliente do serviço, o tipo de serviço, endereço,
+    //data e status. Além disso adiciona os botões de adicionar novo cliente, novo tipo de serviço 
+    // e novo endereço, para evitar duplicatas no banco de dados.  
     private JComboBox<String> clienteCombo = new JComboBox<>();
     private JButton novoClienteButton = new JButton("Novo cliente");
 
-    // Tipo de serviço
     private JComboBox<String> tipoServicoCombo = new JComboBox<>();
     private JButton novoTipoButton = new JButton("Novo tipo");
 
-    // Endereço do serviço
     private JComboBox<String> enderecoCombo = new JComboBox<>();
     private JButton novoEnderecoButton = new JButton("Novo endereço");
 
-    // Dados do serviço
     private JTextField dataField = new JTextField(12);
 
+    // status não precisa de um botão para "novo status", só se pode escolher entre opções predefinidas
     private JComboBox<String> statusCombo = new JComboBox<>(new String[] {
         "Em orçamento",
         "Agendado",
@@ -48,15 +47,15 @@ public class PanelAddServicos extends JPanel {
         "Cancelado"
     });
 
+    // observações por si só já são diferentes em cada serviço cadastrado, por isso não é necessário se preocupar com duplicatas
     private JTextArea observacoesArea = new JTextArea(3, 25);
 
-    // Ações principais
+    // cria os elementos principais, o botão para finalizar e cadastrar o serviço, e outro para limpar todos os campos do formulário
     private JButton salvarButton = new JButton("Cadastrar serviço");
     private JButton limparButton = new JButton("Limpar campos");
 
     private boolean modoEdicao = false;
 
-    // Construtor
     public PanelAddServicos() {
 
         setLayout(new BorderLayout(10, 10));
@@ -71,7 +70,6 @@ public class PanelAddServicos extends JPanel {
             new BoxLayout(formulario, BoxLayout.Y_AXIS)
         );
 
-        // 1. Cliente
         JPanel clientePanel = criarSecao("Cliente");
 
         clientePanel.setLayout(
@@ -82,7 +80,6 @@ public class PanelAddServicos extends JPanel {
         clientePanel.add(clienteCombo);
         clientePanel.add(novoClienteButton);
 
-        // 2. Tipo de serviço
         JPanel tipoPanel = criarSecao("Tipo de serviço");
 
         tipoPanel.setLayout(
@@ -93,7 +90,6 @@ public class PanelAddServicos extends JPanel {
         tipoPanel.add(tipoServicoCombo);
         tipoPanel.add(novoTipoButton);
 
-        // 3. Endereço
         JPanel enderecoPanel = criarSecao("Endereço do serviço");
 
         enderecoPanel.setLayout(
@@ -104,7 +100,6 @@ public class PanelAddServicos extends JPanel {
         enderecoPanel.add(enderecoCombo);
         enderecoPanel.add(novoEnderecoButton);
 
-        // 4. Dados gerais
         JPanel dadosPanel = criarSecao("Dados do serviço");
 
         dadosPanel.setLayout(
@@ -117,7 +112,6 @@ public class PanelAddServicos extends JPanel {
         dadosPanel.add(new JLabel("Status:"));
         dadosPanel.add(statusCombo);
 
-        // 5. Observações
         JPanel observacoesPanel = criarSecao("Observações");
 
         observacoesPanel.add(
@@ -137,7 +131,6 @@ public class PanelAddServicos extends JPanel {
             BorderLayout.CENTER
         );
 
-        // Botões inferiores
         JPanel botoesPanel = new JPanel(
             new FlowLayout(FlowLayout.RIGHT)
         );
@@ -147,7 +140,7 @@ public class PanelAddServicos extends JPanel {
 
         add(botoesPanel, BorderLayout.SOUTH);
 
-        // Ação local da interface
+        // usa o action listener para ouvir quando o botão de limpar campos é acionado, ativando a função limparCampos
         limparButton.addActionListener(
             e -> limparCampos()
         );
@@ -155,11 +148,11 @@ public class PanelAddServicos extends JPanel {
         // Botões de cadastro auxiliar
         configurarBotoesCadastroAuxiliar();
 
-        // Status inicial
+        // define o status inicial no cadatro de serviço como "em orçamento", o elemento 0 no index do combobox
         statusCombo.setSelectedIndex(0);
     }
 
-    // Criação de seções
+    // Criação de seções no layout
     private JPanel criarSecao(String titulo) {
 
         JPanel panel = new JPanel(
@@ -173,7 +166,7 @@ public class PanelAddServicos extends JPanel {
         return panel;
     }
 
-    // Cadastro auxiliar
+    // define a função de cadastro auxiliar
     private void configurarBotoesCadastroAuxiliar() {
 
         novoClienteButton.addActionListener(e ->
