@@ -56,7 +56,7 @@ public class PanelTabela extends JPanel {
 	private List<Servico> servicosNaTabela = new ArrayList<>();
 	private TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(dtm);
 
-	// Componentes de Busca e Ordenação
+	// Componentes de Busca e Ordenação TABELA
 	private JTextField buscaField = new JTextField(15);
 	private JButton buscarButton = new JButton("Buscar");
 	private JButton limpaFiltrosButton = new JButton("Limpar Filtros");
