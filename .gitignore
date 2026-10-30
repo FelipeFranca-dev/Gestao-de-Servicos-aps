@@ -4,6 +4,7 @@
 .mtj.tmp/
 *.class
 *.jar
+!Código_0.0/libs/mysql-connector-j-26.10.0.jar
 *.war
 *.ear
 *.nar
