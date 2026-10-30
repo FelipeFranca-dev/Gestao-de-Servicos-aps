@@ -1,4 +1,3 @@
-
 package view.janelas;
 
 import java.awt.BorderLayout;
@@ -14,7 +13,6 @@ import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -24,9 +22,9 @@ import javax.swing.SwingUtilities;
 public class PanelAddServicos extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    // cria os elementos principais, sendo o cliente do serviço, o tipo de serviço, endereço,
-    //data e status. Além disso adiciona os botões de adicionar novo cliente, novo tipo de serviço 
-    // e novo endereço, para evitar duplicatas no banco de dados.  
+    // Cliente, tipo e endereço são escolhidos em listas (para evitar nomes repetidos/digitados diferente).
+    // Os botões "Novo ..." adicionam uma opção à lista; ela passa a existir de verdade
+    // quando um serviço com ela é cadastrado.
     private JComboBox<String> clienteCombo = new JComboBox<>();
     private JButton novoClienteButton = new JButton("Novo cliente");
 
@@ -38,19 +36,18 @@ public class PanelAddServicos extends JPanel {
 
     private JTextField dataField = new JTextField(12);
 
-    // status não precisa de um botão para "novo status", só se pode escolher entre opções predefinidas
+    // status não tem botão de "novo": só se escolhe entre opções predefinidas
     private JComboBox<String> statusCombo = new JComboBox<>(new String[] {
-        "Em orçamento",
-        "Agendado",
-        "Em andamento",
-        "Concluído",
-        "Cancelado"
+            "Em orçamento",
+            "Agendado",
+            "Em andamento",
+            "Concluído",
+            "Cancelado"
     });
 
-    // observações por si só já são diferentes em cada serviço cadastrado, por isso não é necessário se preocupar com duplicatas
+    // observações são diferentes em cada serviço, então não há problema de duplicata
     private JTextArea observacoesArea = new JTextArea(3, 25);
 
-    // cria os elementos principais, o botão para finalizar e cadastrar o serviço, e outro para limpar todos os campos do formulário
     private JButton salvarButton = new JButton("Cadastrar serviço");
     private JButton limparButton = new JButton("Limpar campos");
 
@@ -59,166 +56,94 @@ public class PanelAddServicos extends JPanel {
     public PanelAddServicos() {
 
         setLayout(new BorderLayout(10, 10));
-
-        setBorder(
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        );
+        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
 
         JPanel formulario = new JPanel();
-
-        formulario.setLayout(
-            new BoxLayout(formulario, BoxLayout.Y_AXIS)
-        );
+        formulario.setLayout(new BoxLayout(formulario, BoxLayout.Y_AXIS));
 
         JPanel clientePanel = criarSecao("Cliente");
-
-        clientePanel.setLayout(
-            new FlowLayout(FlowLayout.LEFT)
-        );
-
+        clientePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         clientePanel.add(new JLabel("Cliente:"));
         clientePanel.add(clienteCombo);
         clientePanel.add(novoClienteButton);
 
         JPanel tipoPanel = criarSecao("Tipo de serviço");
-
-        tipoPanel.setLayout(
-            new FlowLayout(FlowLayout.LEFT)
-        );
-
+        tipoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         tipoPanel.add(new JLabel("Tipo:"));
         tipoPanel.add(tipoServicoCombo);
         tipoPanel.add(novoTipoButton);
 
         JPanel enderecoPanel = criarSecao("Endereço do serviço");
-
-        enderecoPanel.setLayout(
-            new FlowLayout(FlowLayout.LEFT)
-        );
-
+        enderecoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
         enderecoPanel.add(new JLabel("Endereço:"));
         enderecoPanel.add(enderecoCombo);
         enderecoPanel.add(novoEnderecoButton);
 
         JPanel dadosPanel = criarSecao("Dados do serviço");
-
-        dadosPanel.setLayout(
-            new GridLayout(0, 2, 8, 8)
-        );
-
-        dadosPanel.add(new JLabel("Data (dd/mm/aa):"));
+        dadosPanel.setLayout(new GridLayout(0, 2, 8, 8));
+        dadosPanel.add(new JLabel("Data (dd/mm/aaaa):"));
         dadosPanel.add(dataField);
-
         dadosPanel.add(new JLabel("Status:"));
         dadosPanel.add(statusCombo);
 
+        observacoesArea.setLineWrap(true);
+        observacoesArea.setWrapStyleWord(true);
         JPanel observacoesPanel = criarSecao("Observações");
+        observacoesPanel.add(new JScrollPane(observacoesArea), BorderLayout.CENTER);
 
-        observacoesPanel.add(
-            new JScrollPane(observacoesArea),
-            BorderLayout.CENTER
-        );
-
-        // Montagem da tela
         formulario.add(clientePanel);
         formulario.add(tipoPanel);
         formulario.add(enderecoPanel);
         formulario.add(dadosPanel);
         formulario.add(observacoesPanel);
 
-        add(
-            new JScrollPane(formulario),
-            BorderLayout.CENTER
-        );
+        add(new JScrollPane(formulario), BorderLayout.CENTER);
 
-        JPanel botoesPanel = new JPanel(
-            new FlowLayout(FlowLayout.RIGHT)
-        );
-
+        JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         botoesPanel.add(limparButton);
         botoesPanel.add(salvarButton);
-
         add(botoesPanel, BorderLayout.SOUTH);
 
-        // usa o action listener para ouvir quando o botão de limpar campos é acionado, ativando a função limparCampos
-        limparButton.addActionListener(
-            e -> limparCampos()
-        );
+        limparButton.addActionListener(e -> limparCampos());
 
-        // Botões de cadastro auxiliar
         configurarBotoesCadastroAuxiliar();
 
-        // define o status inicial no cadatro de serviço como "em orçamento", o elemento 0 no index do combobox
+        // status inicial: "Em orçamento" (índice 0)
         statusCombo.setSelectedIndex(0);
     }
 
-    // Criação de seções no layout
     private JPanel criarSecao(String titulo) {
-
-        JPanel panel = new JPanel(
-            new BorderLayout(5, 5)
-        );
-
-        panel.setBorder(
-            BorderFactory.createTitledBorder(titulo)
-        );
-
+        JPanel panel = new JPanel(new BorderLayout(5, 5));
+        panel.setBorder(BorderFactory.createTitledBorder(titulo));
         return panel;
     }
 
-    // define a função de cadastro auxiliar
+    // Os botões "Novo ..." abrem um pequeno diálogo e adicionam o valor digitado ao combo.
     private void configurarBotoesCadastroAuxiliar() {
 
         novoClienteButton.addActionListener(e ->
-            abrirCadastro(
-                "Cadastrar cliente",
-                "Nome do cliente:",
-                this::adicionarClienteNaLista
-            )
-        );
+                abrirCadastro("Cadastrar cliente", "Nome do cliente:", this::adicionarClienteNaLista));
 
         novoTipoButton.addActionListener(e ->
-            abrirCadastro(
-                "Cadastrar tipo de serviço",
-                "Nome do tipo de serviço:",
-                this::adicionarTipoNaLista
-            )
-        );
+                abrirCadastro("Cadastrar tipo de serviço", "Nome do tipo de serviço:", this::adicionarTipoNaLista));
 
         novoEnderecoButton.addActionListener(e ->
-            abrirCadastro(
-                "Cadastrar endereço",
-                "Endereço:",
-                this::adicionarEnderecoNaLista
-            )
-        );
+                abrirCadastro("Cadastrar endereço", "Endereço:", this::adicionarEnderecoNaLista));
     }
 
-    private void abrirCadastro(
-            String titulo,
-            String rotulo,
-            Consumer<String> aoCadastrar) {
-
+    private void abrirCadastro(String titulo, String rotulo, Consumer<String> aoCadastrar) {
         Window janelaPai = SwingUtilities.getWindowAncestor(this);
 
-        CadastroOpcaoDialog dialog = new CadastroOpcaoDialog(
-            janelaPai,
-            titulo,
-            rotulo
-        );
-
+        CadastroOpcaoDialog dialog = new CadastroOpcaoDialog(janelaPai, titulo, rotulo);
         dialog.setVisible(true);
 
         String valor = dialog.getValorCadastrado();
-
         if (valor != null) {
             aoCadastrar.accept(valor);
         }
     }
 
-    // Limpar formulário
     public void limparCampos() {
-
         clienteCombo.setSelectedIndex(-1);
         tipoServicoCombo.setSelectedIndex(-1);
         enderecoCombo.setSelectedIndex(-1);
@@ -230,23 +155,17 @@ public class PanelAddServicos extends JPanel {
         setModoEdicao(false);
     }
 
-    // Modo de cadastro / edição
     public void setModoEdicao(boolean modoEdicao) {
-
         this.modoEdicao = modoEdicao;
-
-        if (modoEdicao) {
-            salvarButton.setText("Salvar alterações");
-        } else {
-            salvarButton.setText("Cadastrar serviço");
-        }
+        salvarButton.setText(modoEdicao ? "Salvar alterações" : "Cadastrar serviço");
     }
 
     public boolean isModoEdicao() {
         return modoEdicao;
     }
 
-    // Carregamento dos ComboBoxes
+    // ----- Listas dos combos (o Controller manda os valores do DAO) -----
+
     public void setClientes(List<String> clientes) {
         preencherCombo(clienteCombo, clientes);
     }
@@ -259,26 +178,29 @@ public class PanelAddServicos extends JPanel {
         preencherCombo(enderecoCombo, enderecos);
     }
 
-    private void preencherCombo(
-            JComboBox<String> combo,
-            List<String> itens) {
+    /**
+     * Troca os itens do combo mas mantém o que o usuário já tinha escolhido
+     * (inclusive um "Novo cliente" que ainda não foi salvo no DAO).
+     */
+    private void preencherCombo(JComboBox<String> combo, List<String> itens) {
+        String selecionado = (String) combo.getSelectedItem();
 
         combo.removeAllItems();
 
-        if (itens == null) {
-            return;
-        }
-
-        for (String item : itens) {
-            if (item != null && !item.isBlank()) {
-                combo.addItem(item);
+        if (itens != null) {
+            for (String item : itens) {
+                if (item != null && !item.isBlank()) {
+                    combo.addItem(item);
+                }
             }
         }
 
         combo.setSelectedIndex(-1);
+        if (selecionado != null && !selecionado.isBlank()) {
+            adicionarOpcao(combo, selecionado);
+        }
     }
 
-    // Adicionar opções às listas
     public void adicionarClienteNaLista(String cliente) {
         adicionarOpcao(clienteCombo, cliente);
     }
@@ -291,10 +213,8 @@ public class PanelAddServicos extends JPanel {
         adicionarOpcao(enderecoCombo, endereco);
     }
 
-    private void adicionarOpcao(
-            JComboBox<String> combo,
-            String opcao) {
-
+    // Se a opção já existe (ignorando maiúsculas), só seleciona; senão adiciona e seleciona.
+    private void adicionarOpcao(JComboBox<String> combo, String opcao) {
         if (opcao == null || opcao.isBlank()) {
             return;
         }
@@ -310,58 +230,14 @@ public class PanelAddServicos extends JPanel {
         combo.setSelectedItem(opcao);
     }
 
-    // Mensagens da interface
-    public void mostrarErro(String mensagem) {
+    // ----- Ligação com o Controller -----
 
-        JOptionPane.showMessageDialog(
-            this,
-            mensagem,
-            "Erro",
-            JOptionPane.ERROR_MESSAGE
-        );
-    }
-
-    public void mostrarMensagem(String mensagem) {
-
-        JOptionPane.showMessageDialog(
-            this,
-            mensagem,
-            "Informação",
-            JOptionPane.INFORMATION_MESSAGE
-        );
-    }
-
-    public boolean confirmar(String mensagem) {
-
-        int resposta = JOptionPane.showConfirmDialog(
-            this,
-            mensagem,
-            "Confirmar operação",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.QUESTION_MESSAGE
-        );
-
-        return resposta == JOptionPane.YES_OPTION;
-    }
-
-    // Métodos de conexão com o Controller
     public void addAcaoSalvarServico(ActionListener al) {
         salvarButton.addActionListener(al);
     }
 
-    public void addAcaoNovoCliente(ActionListener al) {
-        novoClienteButton.addActionListener(al);
-    }
+    // ----- Getters -----
 
-    public void addAcaoNovoTipo(ActionListener al) {
-        novoTipoButton.addActionListener(al);
-    }
-
-    public void addAcaoNovoEndereco(ActionListener al) {
-        novoEnderecoButton.addActionListener(al);
-    }
-
-    // Getters
     public String getClienteSelecionado() {
         return (String) clienteCombo.getSelectedItem();
     }

@@ -33,32 +33,32 @@ public class CadastroOpcaoDialog extends JDialog {
         JPanel painelPrincipal = new JPanel(new BorderLayout(8, 8));
 
         painelPrincipal.setBorder(
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
+                BorderFactory.createEmptyBorder(15, 15, 15, 15)
         );
 
         painelPrincipal.add(
-            new JLabel(rotulo),
-            BorderLayout.NORTH
+                new JLabel(rotulo),
+                BorderLayout.NORTH
         );
 
         painelPrincipal.add(
-            campoTexto,
-            BorderLayout.CENTER
+                campoTexto,
+                BorderLayout.CENTER
         );
 
         JButton botaoCancelar = new JButton("Cancelar");
         JButton botaoCadastrar = new JButton("Cadastrar");
 
         JPanel painelBotoes = new JPanel(
-            new FlowLayout(FlowLayout.RIGHT)
+                new FlowLayout(FlowLayout.RIGHT)
         );
 
         painelBotoes.add(botaoCancelar);
         painelBotoes.add(botaoCadastrar);
 
         painelPrincipal.add(
-            painelBotoes,
-            BorderLayout.SOUTH
+                painelBotoes,
+                BorderLayout.SOUTH
         );
 
         setContentPane(painelPrincipal);
@@ -70,10 +70,10 @@ public class CadastroOpcaoDialog extends JDialog {
 
             if (valor.isEmpty()) {
                 JOptionPane.showMessageDialog(
-                    this,
-                    "Preencha o campo antes de cadastrar.",
-                    "Campo obrigatório",
-                    JOptionPane.WARNING_MESSAGE
+                        this,
+                        "Preencha o campo antes de cadastrar.",
+                        "Campo obrigatório",
+                        JOptionPane.WARNING_MESSAGE
                 );
 
                 campoTexto.requestFocusInWindow();

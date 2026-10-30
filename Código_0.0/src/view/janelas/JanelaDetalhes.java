@@ -8,7 +8,7 @@ import java.awt.Window;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,31 +25,36 @@ import entities.Servico;
 
 public class JanelaDetalhes extends JDialog {
 
-    private Servico servico;
-    private Consumer<Servico> aoSalvar;
-    private Consumer<Servico> aoExcluir;
+    private static final long serialVersionUID = 1L;
 
-    private JLabel idLabel = new JLabel();
-    private JTextField clienteField = new JTextField(20);
-    private JComboBox<String> tiposervicoCombo = new JComboBox<>();
-    private JTextField dataField = new JTextField(20);
-    private JComboBox<String> statusCombo = new JComboBox<>(new String[] {
+    private Servico servico;
+
+    // Cada ação devolve true se deu certo (o Controller já mostra o erro se falhar)
+    private final Predicate<Servico> aoSalvar;
+    private final Predicate<Servico> aoExcluir;
+
+    private final JLabel idLabel = new JLabel();
+    private final JTextField clienteField = new JTextField(20);
+    private final JComboBox<String> tiposervicoCombo = new JComboBox<>();
+    private final JTextField enderecoField = new JTextField(20);
+    private final JTextField dataField = new JTextField(20);
+    private final JComboBox<String> statusCombo = new JComboBox<>(new String[] {
             "Em orçamento",
             "Agendado",
             "Em andamento",
             "Concluído",
             "Cancelado"
-        });
-    private JTextArea obsArea = new JTextArea(6, 20);
+    });
+    private final JTextArea obsArea = new JTextArea(6, 20);
 
-    private JButton editarButton = new JButton("Editar");
-    private JButton excluirButton = new JButton("Excluir");
-    private JButton fecharButton = new JButton("Fechar");
+    private final JButton editarButton = new JButton("Editar");
+    private final JButton excluirButton = new JButton("Excluir");
+    private final JButton fecharButton = new JButton("Fechar");
 
     private boolean editando = false;
 
     public JanelaDetalhes(Window dono, Servico servico, List<String> tiposDisponiveis,
-                          Consumer<Servico> aoSalvar, Consumer<Servico> aoExcluir) {
+                          Predicate<Servico> aoSalvar, Predicate<Servico> aoExcluir) {
         super(dono, "Detalhes do serviço", Dialog.ModalityType.APPLICATION_MODAL);
 
         this.servico = servico;
@@ -65,7 +70,7 @@ public class JanelaDetalhes extends JDialog {
         obsArea.setLineWrap(true);
         obsArea.setWrapStyleWord(true);
 
-        JPanel painelCampos = new JPanel(new GridLayout(5, 2, 8, 8));
+        JPanel painelCampos = new JPanel(new GridLayout(6, 2, 8, 8));
         painelCampos.setBorder(BorderFactory.createEmptyBorder(12, 12, 6, 12));
         painelCampos.add(new JLabel("ID:"));
         painelCampos.add(idLabel);
@@ -73,6 +78,8 @@ public class JanelaDetalhes extends JDialog {
         painelCampos.add(clienteField);
         painelCampos.add(new JLabel("Tipo de serviço:"));
         painelCampos.add(tiposervicoCombo);
+        painelCampos.add(new JLabel("Endereço:"));
+        painelCampos.add(enderecoField);
         painelCampos.add(new JLabel("Data (dd/mm/aaaa):"));
         painelCampos.add(dataField);
         painelCampos.add(new JLabel("Status:"));
@@ -93,7 +100,7 @@ public class JanelaDetalhes extends JDialog {
 
         editarButton.addActionListener(e -> cliqueEditar());
         excluirButton.addActionListener(e -> excluir());
-        fecharButton.addActionListener(e -> dispose());
+        fecharButton.addActionListener(e -> cliqueFechar());
 
         preencheCampos();
         liberaEdicao(false);
@@ -105,22 +112,42 @@ public class JanelaDetalhes extends JDialog {
     private void preencheCampos() {
         idLabel.setText(String.valueOf(servico.getId()));
         clienteField.setText(servico.getCliente());
-        tiposervicoCombo.setSelectedItem(servico.getTipo());
-        if (servico.getData() != null) {
-            dataField.setText(servico.getData().format(Servico.FORMATO_DATA));
-        }
-        statusCombo.setSelectedItem(servico.getStatus());
+        selecionaOuAdiciona(tiposervicoCombo, servico.getTipo());
+        enderecoField.setText(servico.getEndereco());
+        dataField.setText(servico.getData() != null ? servico.getData().format(Servico.FORMATO_DATA) : "");
+        selecionaOuAdiciona(statusCombo, servico.getStatus());
         obsArea.setText(servico.getObservacoes());
     }
 
+    // JComboBox não editável ignora setSelectedItem de um valor que não está na lista,
+    // então adicionamos o valor antes (ex.: um tipo antigo que não está mais na lista).
+    private void selecionaOuAdiciona(JComboBox<String> combo, String valor) {
+        if (valor == null || valor.isBlank()) {
+            return;
+        }
+        boolean existe = false;
+        for (int i = 0; i < combo.getItemCount(); i++) {
+            if (valor.equals(combo.getItemAt(i))) {
+                existe = true;
+                break;
+            }
+        }
+        if (!existe) {
+            combo.addItem(valor);
+        }
+        combo.setSelectedItem(valor);
+    }
+
     private void liberaEdicao(boolean pode) {
-        clienteField.setEditable(false);
+        clienteField.setEditable(pode);
         tiposervicoCombo.setEnabled(pode);
+        enderecoField.setEditable(pode);
         dataField.setEditable(pode);
         statusCombo.setEnabled(pode);
         obsArea.setEditable(pode);
 
         editarButton.setText(pode ? "Salvar" : "Editar");
+        fecharButton.setText(pode ? "Cancelar" : "Fechar");
         editando = pode;
     }
 
@@ -132,7 +159,29 @@ public class JanelaDetalhes extends JDialog {
         }
     }
 
+    // Enquanto edita, o botão vira "Cancelar" e descarta as alterações; senão, fecha a janela.
+    private void cliqueFechar() {
+        if (editando) {
+            preencheCampos();
+            liberaEdicao(false);
+        } else {
+            dispose();
+        }
+    }
+
     private void salvar() {
+        String cliente = clienteField.getText().trim();
+        if (cliente.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Informe o nome do cliente.");
+            return;
+        }
+
+        String endereco = enderecoField.getText().trim();
+        if (endereco.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "Informe o endereço.");
+            return;
+        }
+
         LocalDate novaData;
         try {
             novaData = LocalDate.parse(dataField.getText().trim(), Servico.FORMATO_DATA);
@@ -147,14 +196,23 @@ public class JanelaDetalhes extends JDialog {
             return;
         }
 
-        servico.setTipo(tipoSelecionado);
-        servico.setData(novaData);
-        servico.setStatus((String) statusCombo.getSelectedItem());
-        servico.setObservacoes(obsArea.getText());
+        // Cria uma cópia com os dados novos; o original só é trocado se o salvamento der certo.
+        Servico atualizado = new Servico(
+                servico.getId(),
+                cliente,
+                tipoSelecionado,
+                endereco,
+                novaData,
+                (String) statusCombo.getSelectedItem(),
+                obsArea.getText().trim());
 
-        if (aoSalvar != null) {
-            aoSalvar.accept(servico);
+        boolean salvou = (aoSalvar == null) || aoSalvar.test(atualizado);
+        if (!salvou) {
+            return; // o Controller já mostrou o erro; continua em modo de edição
         }
+
+        servico = atualizado;
+        preencheCampos();
         liberaEdicao(false);
         JOptionPane.showMessageDialog(this, "Serviço salvo!");
     }
@@ -165,10 +223,10 @@ public class JanelaDetalhes extends JDialog {
                 "Excluir serviço", JOptionPane.YES_NO_OPTION);
 
         if (opcao == JOptionPane.YES_OPTION) {
-            if (aoExcluir != null) {
-                aoExcluir.accept(servico);
+            boolean excluiu = (aoExcluir == null) || aoExcluir.test(servico);
+            if (excluiu) {
+                dispose();
             }
-            dispose();
         }
     }
 }

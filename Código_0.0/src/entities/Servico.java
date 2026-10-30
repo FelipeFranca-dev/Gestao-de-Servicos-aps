@@ -2,11 +2,15 @@ package entities;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.ResolverStyle;
 
 public class Servico {
 
-	public static final DateTimeFormatter FORMATO_DATA = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	
+	// STRICT: rejeita datas inexistentes (ex.: 31/02/2026) em vez de "arredondar" para 28/02.
+	// Com STRICT o ano precisa ser "uuuu" (e não "yyyy").
+	public static final DateTimeFormatter FORMATO_DATA =
+			DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
+
 	private Integer id;
 	private String cliente;
 	private String tipo;
@@ -15,7 +19,7 @@ public class Servico {
 	private String status;
 	private String observacoes;
 
-	public Servico(Integer id, String cliente, String tipo, String endereco,LocalDate data, String status, String observacoes) {
+	public Servico(Integer id, String cliente, String tipo, String endereco, LocalDate data, String status, String observacoes) {
 		this.id = id;
 		this.cliente = cliente;
 		this.tipo = tipo;
@@ -25,16 +29,16 @@ public class Servico {
 		this.observacoes = observacoes;
 	}
 
-	public Servico(String cliente, String tipo, String endereco,LocalDate data, String status, String observacoes) {
+	public Servico(String cliente, String tipo, String endereco, LocalDate data, String status, String observacoes) {
 		this(null, cliente, tipo, endereco, data, status, observacoes);
 	}
 
 	public Integer getId() {return id;}
 	public void setId(int id) {this.id = id;}
-	
+
 	public String getCliente() {return cliente;}
 	public void setCliente(String cliente) {this.cliente = cliente;}
-	
+
 	public String getTipo() {return tipo;}
 	public void setTipo(String tipo) {this.tipo = tipo;}
 
