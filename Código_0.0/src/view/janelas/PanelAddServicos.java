@@ -26,9 +26,8 @@ import javax.swing.SwingUtilities;
 public class PanelAddServicos extends JPanel {
     private static final long serialVersionUID = 1L;
 
-    // Cliente, tipo e endereço são escolhidos em listas (para evitar nomes repetidos/digitados diferente).
-    // Os botões "Novo ..." adicionam uma opção à lista; ela passa a existir de verdade
-    // quando um serviço com ela é cadastrado.
+    // Cliente, tipo e endereço são escolhidos em combobox para evitar nomes repetidos/digitados diferente
+    // Os botões de Novo (cliente, tipo de serviço ou endereço) adicionam uma opção à lista; ela passa a existir só quando o serviço é criado
     private JComboBox<String> clienteCombo = new JComboBox<>();
     private JButton novoClienteButton = new JButton("Novo cliente");
 
@@ -40,7 +39,7 @@ public class PanelAddServicos extends JPanel {
 
     private JTextField dataField = new JTextField(12);
 
-    // status não tem botão de "novo": só se escolhe entre opções predefinidas
+    // status não tem botão de novo status; não dá pra criar um status novo, só usar os pré-definidos
     private JComboBox<String> statusCombo = new JComboBox<>(new String[] {
             "Em orçamento",
             "Agendado",
@@ -49,7 +48,7 @@ public class PanelAddServicos extends JPanel {
             "Cancelado"
     });
 
-    // observações são diferentes em cada serviço, então não há problema de duplicata
+    // observações são diferentes em cada serviço por definição, então não precisa do combobox pra evitar duplicatas
     private JTextArea observacoesArea = new JTextArea(3, 25);
 
     private JButton salvarButton = new JButton("Cadastrar serviço");
@@ -62,13 +61,11 @@ public class PanelAddServicos extends JPanel {
         setLayout(new BorderLayout(0, 12));
         setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        // ----- Título -----
         JLabel titulo = new JLabel("Novo serviço");
         titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 22f));
         titulo.setForeground(new Color(31, 95, 168));
         add(titulo, BorderLayout.NORTH);
 
-        // ----- Cartão central (fundo branco com borda fina) -----
         JPanel cartao = new JPanel(new GridBagLayout());
         cartao.setBackground(Color.WHITE);
         cartao.setBorder(BorderFactory.createCompoundBorder(
@@ -81,7 +78,6 @@ public class PanelAddServicos extends JPanel {
         adicionaLinha(cartao, 3, "Data (dd/mm/aaaa):", dataField, null);
         adicionaLinha(cartao, 4, "Status:", statusCombo, null);
 
-        // Observações: a caixa cresce junto com a janela
         observacoesArea.setLineWrap(true);
         observacoesArea.setWrapStyleWord(true);
 
@@ -102,7 +98,6 @@ public class PanelAddServicos extends JPanel {
 
         add(cartao, BorderLayout.CENTER);
 
-        // ----- Botões alinhados à direita -----
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         botoesPanel.add(limparButton);
         botoesPanel.add(salvarButton);
@@ -112,14 +107,10 @@ public class PanelAddServicos extends JPanel {
 
         configurarBotoesCadastroAuxiliar();
 
-        // status inicial: "Em orçamento" (índice 0)
+        // ao criar um serviço novo, o status inicial sempre é: "Em orçamento", os combobox permitem catalogar serviços já concluídos
         statusCombo.setSelectedIndex(0);
     }
 
-    /**
-     * Coloca uma linha no cartão: rótulo | campo | botão (opcional).
-     * Sem botão, o campo ocupa também a coluna do botão.
-     */
     private void adicionaLinha(JPanel painel, int linha, String rotulo, JComponent campo, JButton botao) {
         GridBagConstraints g = new GridBagConstraints();
         g.gridy = linha;
@@ -145,7 +136,7 @@ public class PanelAddServicos extends JPanel {
         }
     }
 
-    // Os botões "Novo ..." abrem um pequeno diálogo e adicionam o valor digitado ao combo.
+    // Os botões Novo (cliente, tipo de serviço e endereço) abrem uma caixa de diálogo e adicionam o valor digitado ao combo.
     private void configurarBotoesCadastroAuxiliar() {
 
         novoClienteButton.addActionListener(e ->
@@ -191,8 +182,6 @@ public class PanelAddServicos extends JPanel {
         return modoEdicao;
     }
 
-    // ----- Listas dos combos (o Controller manda os valores do DAO) -----
-
     public void setClientes(List<String> clientes) {
         preencherCombo(clienteCombo, clientes);
     }
@@ -205,10 +194,6 @@ public class PanelAddServicos extends JPanel {
         preencherCombo(enderecoCombo, enderecos);
     }
 
-    /**
-     * Troca os itens do combo mas mantém o que o usuário já tinha escolhido
-     * (inclusive um "Novo cliente" que ainda não foi salvo no DAO).
-     */
     private void preencherCombo(JComboBox<String> combo, List<String> itens) {
         String selecionado = (String) combo.getSelectedItem();
 
@@ -240,7 +225,7 @@ public class PanelAddServicos extends JPanel {
         adicionarOpcao(enderecoCombo, endereco);
     }
 
-    // Se a opção já existe (ignorando maiúsculas), só seleciona; senão adiciona e seleciona.
+    // Se a opção já existe, só seleciona; senão adiciona e seleciona, e ignora as maiúsculas.
     private void adicionarOpcao(JComboBox<String> combo, String opcao) {
         if (opcao == null || opcao.isBlank()) {
             return;
@@ -257,13 +242,9 @@ public class PanelAddServicos extends JPanel {
         combo.setSelectedItem(opcao);
     }
 
-    // ----- Ligação com o Controller -----
-
     public void addAcaoSalvarServico(ActionListener al) {
         salvarButton.addActionListener(al);
     }
-
-    // ----- Getters -----
 
     public String getClienteSelecionado() {
         return (String) clienteCombo.getSelectedItem();

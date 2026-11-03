@@ -12,26 +12,15 @@ import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.UIManager.LookAndFeelInfo;
 
-/**
- * Visual único para todas as abas. Chame Tema.aplicar() uma vez, antes de criar a janela.
- *
- * - Se o .jar do FlatLaf estiver no projeto, usa o FlatLaf (visual plano e moderno).
- * - Se não estiver, usa o Nimbus (já vem no Java). O programa funciona nos dois casos.
- *
- * Para voltar ao visual padrão do Java, é só comentar a chamada Tema.aplicar().
- */
 public class Tema {
 
-    // Paleta (neutros suaves + um azul de destaque)
-    // Para escurecer ou clarear, mexa só nestes três valores: FUNDO, CARTAO e CAMPO.
     public static final Color AZUL = new Color(37, 99, 235);
-    public static final Color FUNDO = new Color(226, 230, 236);   // fundo da janela
-    public static final Color CARTAO = new Color(244, 246, 249);  // "papel" dos cartões
-    public static final Color CAMPO = new Color(250, 251, 252);   // campos, caixas e tabela (quase branco)
+    public static final Color FUNDO = new Color(226, 230, 236);   
+    public static final Color CARTAO = new Color(244, 246, 249);  
+    public static final Color CAMPO = new Color(250, 251, 252);   
     public static final Color BORDA = new Color(207, 213, 222);
     public static final Color TEXTO = new Color(31, 41, 55);
 
-    /** Converte uma cor para o texto "#RRGGBB" que o FlatLaf entende. */
     private static String hex(Color c) {
         return String.format("#%02X%02X%02X", c.getRed(), c.getGreen(), c.getBlue());
     }
@@ -45,11 +34,9 @@ public class Tema {
         }
     }
 
-    // ---------- FlatLaf (via reflexão: o código compila mesmo sem o .jar) ----------
-
     private static boolean aplicaFlatLaf() {
         try {
-            // cores principais: precisam ser definidas ANTES de ligar o tema
+            
             Class.forName("com.formdev.flatlaf.FlatLaf")
                     .getMethod("setGlobalExtraDefaults", Map.class)
                     .invoke(null, Map.of(
@@ -61,14 +48,12 @@ public class Tema {
                     .getMethod("setup")
                     .invoke(null);
 
-            // cantos arredondados
             UIManager.put("Component.arc", 12);
             UIManager.put("Button.arc", 12);
             UIManager.put("TextComponent.arc", 12);
             UIManager.put("ScrollBar.thumbArc", 999);
             UIManager.put("ScrollBar.trackArc", 999);
 
-            // abas e tabela mais arejadas
             UIManager.put("TabbedPane.tabHeight", 40);
             UIManager.put("Table.rowHeight", 32);
             UIManager.put("Table.showHorizontalLines", true);
@@ -79,11 +64,9 @@ public class Tema {
             UIManager.put("defaultFont", new Font("Segoe UI", Font.PLAIN, 14));
             return true;
         } catch (Exception | LinkageError e) {
-            return false; // sem FlatLaf: cai para o Nimbus
+            return false; 
         }
     }
-
-    // ---------- Nimbus (plano B, sem instalar nada) ----------
 
     private static void aplicaNimbus() {
         try {
@@ -107,9 +90,6 @@ public class Tema {
         }
     }
 
-    // ---------- Peças prontas para as telas ficarem iguais ----------
-
-    /** Título grande no topo de cada aba. */
     public static JLabel criaTitulo(String texto) {
         JLabel titulo = new JLabel(texto);
         titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 24f));
@@ -117,7 +97,6 @@ public class Tema {
         return titulo;
     }
 
-    /** Cartão branco com borda fina (o "papel" onde ficam os campos ou a tabela). */
     public static JPanel criaCartao(LayoutManager layout) {
         JPanel cartao = new JPanel(layout);
         cartao.setBackground(CARTAO);
@@ -126,8 +105,7 @@ public class Tema {
                 BorderFactory.createEmptyBorder(16, 16, 16, 16)));
         return cartao;
     }
-
-    /** Botão de ação principal: fundo azul e letra branca. */
+    
     public static void destaque(JButton botao) {
         botao.setBackground(AZUL);
         botao.setForeground(Color.WHITE);

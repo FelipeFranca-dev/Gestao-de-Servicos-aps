@@ -42,7 +42,7 @@ public class PanelTabela extends JPanel {
 
 	private final Object[] colNames = {"Id", "Cliente", "Tipo de serviço", "Status", "Data"};
 
-	// A coluna Data guarda LocalDate de verdade (e não texto), assim a ordenação é cronológica.
+	// A Data salva LocalDate (e não texto aleatório), isso controla pra garantir que o usuário coloca a data no lugar de colocar a data.
 	private final DefaultTableModel dtm = new DefaultTableModel(colNames, 0) {
 		private static final long serialVersionUID = 1L;
 
@@ -66,7 +66,6 @@ public class PanelTabela extends JPanel {
 	private List<Servico> servicosNaTabela = new ArrayList<>();
 	private final TableRowSorter<DefaultTableModel> sorter = new TableRowSorter<>(dtm);
 
-	// Componentes de busca e ordenação
 	private final JTextField buscaField = new JTextField(15);
 	private final JButton buscarButton = new JButton("Buscar");
 	private final JButton limpaFiltrosButton = new JButton("Limpar Filtros");
@@ -76,13 +75,11 @@ public class PanelTabela extends JPanel {
 	private final JComboBox<String> ordemBox = new JComboBox<>(
 			new String[]{"Crescente", "Decrescente"});
 
-	// Filtro pelos valores da coluna escolhida em "Ordenar por"
 	private final JComboBox<String> valorColunaBox = new JComboBox<>();
 	private boolean atualizandoValorColuna = false;
 
 	private final JButton detalhesButton = new JButton("Ver detalhes do serviço");
 
-	// Ligações com o Controller
 	private List<String> tiposServico = new ArrayList<>();
 	private Predicate<Servico> aoEditar;
 	private Predicate<Servico> aoExcluir;
@@ -93,7 +90,7 @@ public class PanelTabela extends JPanel {
 		tabela.setRowSorter(sorter);
 		tabela.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
-		// Mostra a data como dd/MM/aaaa
+		// Mostra a data como dd/MM/aaaa para controle
 		tabela.setDefaultRenderer(LocalDate.class, new DefaultTableCellRenderer() {
 			private static final long serialVersionUID = 1L;
 
@@ -103,7 +100,7 @@ public class PanelTabela extends JPanel {
 			}
 		});
 
-		// Faz a busca e o filtro enxergarem a data como "dd/MM/aaaa" (e não "aaaa-MM-dd")
+		// Faz a busca e o filtro enxergarem a data no padrão "dd/MM/aaaa" (e não "aaaa-MM-dd", padrão esquisito)
 		sorter.setStringConverter(new TableStringConverter() {
 			@Override
 			public String toString(TableModel model, int row, int column) {
@@ -111,13 +108,11 @@ public class PanelTabela extends JPanel {
 			}
 		});
 
-		// Linha 1: busca rápida global
 		JPanel linhaBusca = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		linhaBusca.add(new JLabel("Buscar:"));
 		linhaBusca.add(buscaField);
 		linhaBusca.add(buscarButton);
 
-		// Linha 2: ordenação + filtro por valores da coluna ordenada
 		JPanel linhaOrdemEFiltro = new JPanel(new FlowLayout(FlowLayout.LEFT));
 		linhaOrdemEFiltro.add(new JLabel("Ordenar por:"));
 		linhaOrdemEFiltro.add(ordenarPorBox);
@@ -138,7 +133,7 @@ public class PanelTabela extends JPanel {
 		add(scrollPane, BorderLayout.CENTER);
 		add(panelBaixo, BorderLayout.PAGE_END);
 
-		// Eventos
+		// esses são os ActionListeners que pegam as informações do textfield e dos combobox para colocar nos filtros e fazer funcionar
 		ordenarPorBox.addActionListener(e -> {
 			reordenaColunaTabela();
 			aplicaOrdenacao();
@@ -165,8 +160,6 @@ public class PanelTabela extends JPanel {
 		});
 	}
 
-	// ----- Ligação com o Controller -----
-
 	public void setAcaoEditar(Predicate<Servico> acao) {
 		this.aoEditar = acao;
 	}
@@ -183,7 +176,6 @@ public class PanelTabela extends JPanel {
 		this.tiposServico = (tipos == null) ? new ArrayList<>() : new ArrayList<>(tipos);
 	}
 
-	/** O Controller chama isto com a lista que veio do DAO. */
 	public void setServicos(List<Servico> servicos) {
 		this.servicosNaTabela = new ArrayList<>(servicos);
 		dtm.setRowCount(0);
@@ -192,8 +184,6 @@ public class PanelTabela extends JPanel {
 		}
 		atualizaValoresFiltroColuna(true);
 	}
-
-	// ----- Texto das células -----
 
 	private static String textoDaCelula(Object valor) {
 		if (valor == null) {
@@ -205,9 +195,7 @@ public class PanelTabela extends JPanel {
 		return valor.toString();
 	}
 
-	// ----- Ordenação e filtros -----
-
-	/** Move a coluna escolhida em "Ordenar por" para o começo da tabela. */
+	// Essa parte faz a cola escolhida do "Ordenar por" ir direto pro começo da tabela, facilita o usuário final enxergar o que ele queria.
 	private void reordenaColunaTabela() {
 		restauraOrdemOriginalDasColunas();
 		int colModelo = ordenarPorBox.getSelectedIndex();
@@ -220,11 +208,6 @@ public class PanelTabela extends JPanel {
 		}
 	}
 
-	/**
-	 * Recarrega as opções de "Filtrar valor" com os valores da coluna escolhida.
-	 * @param preservarSelecao true ao recarregar os dados (mantém o filtro que o usuário tinha);
-	 *                         false ao trocar de coluna ou limpar (volta para "Todos").
-	 */
 	private void atualizaValoresFiltroColuna(boolean preservarSelecao) {
 		int colModelo = ordenarPorBox.getSelectedIndex();
 		if (colModelo < 0) {
@@ -233,7 +216,6 @@ public class PanelTabela extends JPanel {
 
 		String anterior = preservarSelecao ? (String) valorColunaBox.getSelectedItem() : null;
 
-		// TreeSet ordena pelo valor real: números como números e datas em ordem cronológica
 		TreeSet<Object> valoresUnicos = new TreeSet<>();
 		for (int i = 0; i < dtm.getRowCount(); i++) {
 			Object val = dtm.getValueAt(i, colModelo);
@@ -279,13 +261,11 @@ public class PanelTabela extends JPanel {
 	private void aplicaFiltros() {
 		List<RowFilter<DefaultTableModel, Object>> filtros = new ArrayList<>();
 
-		// 1. Texto livre (busca em todas as colunas da tabela)
 		String texto = buscaField.getText().trim();
 		if (!texto.isEmpty()) {
 			filtros.add(RowFilter.regexFilter("(?i)" + Pattern.quote(texto)));
 		}
 
-		// 2. Valor escolhido na coluna ativa
 		String valorSelecionado = (String) valorColunaBox.getSelectedItem();
 		if (valorSelecionado != null && !valorSelecionado.equals("Todos")) {
 			int colModelo = ordenarPorBox.getSelectedIndex();
@@ -311,8 +291,6 @@ public class PanelTabela extends JPanel {
 		}
 		atualizaValoresFiltroColuna(false);
 	}
-
-	// ----- Detalhes -----
 
 	private void abreDetalhes() {
 		int linhaNaTela = tabela.getSelectedRow();

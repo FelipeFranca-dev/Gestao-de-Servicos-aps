@@ -29,7 +29,6 @@ public class JanelaDetalhes extends JDialog {
 
     private Servico servico;
 
-    // Cada ação devolve true se deu certo (o Controller já mostra o erro se falhar)
     private final Predicate<Servico> aoSalvar;
     private final Predicate<Servico> aoExcluir;
 
@@ -119,8 +118,6 @@ public class JanelaDetalhes extends JDialog {
         obsArea.setText(servico.getObservacoes());
     }
 
-    // JComboBox não editável ignora setSelectedItem de um valor que não está na lista,
-    // então adicionamos o valor antes (ex.: um tipo antigo que não está mais na lista).
     private void selecionaOuAdiciona(JComboBox<String> combo, String valor) {
         if (valor == null || valor.isBlank()) {
             return;
@@ -159,7 +156,6 @@ public class JanelaDetalhes extends JDialog {
         }
     }
 
-    // Enquanto edita, o botão vira "Cancelar" e descarta as alterações; senão, fecha a janela.
     private void cliqueFechar() {
         if (editando) {
             preencheCampos();
@@ -196,7 +192,6 @@ public class JanelaDetalhes extends JDialog {
             return;
         }
 
-        // Cria uma cópia com os dados novos; o original só é trocado se o salvamento der certo.
         Servico atualizado = new Servico(
                 servico.getId(),
                 cliente,
@@ -208,7 +203,7 @@ public class JanelaDetalhes extends JDialog {
 
         boolean salvou = (aoSalvar == null) || aoSalvar.test(atualizado);
         if (!salvou) {
-            return; // o Controller já mostrou o erro; continua em modo de edição
+            return; 
         }
 
         servico = atualizado;

@@ -6,8 +6,6 @@ import java.time.format.ResolverStyle;
 
 public class Servico {
 
-	// STRICT: rejeita datas inexistentes (ex.: 31/02/2026) em vez de "arredondar" para 28/02.
-	// Com STRICT o ano precisa ser "uuuu" (e não "yyyy").
 	public static final DateTimeFormatter FORMATO_DATA =
 			DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
 

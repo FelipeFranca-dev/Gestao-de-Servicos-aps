@@ -13,12 +13,6 @@ import dao.sql.DaoSql;
 import view.janelas.Tema;
 import view.janelas.ViewJanelas;
 
-/**
- * Como escolher onde os dados ficam (argumento do programa):
- *   csv   -> arquivo files/servicos.csv (padrão, não precisa instalar nada)
- *   sql   -> banco MySQL (rode banco/schema.sql antes e coloque o .jar do conector no classpath)
- *   dummy -> só memória, os dados somem ao fechar
- */
 public class Teste {
 
 	public static void main(String[] args) {

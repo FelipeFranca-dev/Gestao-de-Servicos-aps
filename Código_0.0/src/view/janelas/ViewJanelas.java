@@ -36,8 +36,6 @@ public class ViewJanelas extends JFrame implements View {
         setVisible(true);
     }
 
-    // ----- Cadastro -----
-
     @Override
     public void addAcaoSalvarServico(ActionListener acao) {
         panelAddServicos.addAcaoSalvarServico(acao);
@@ -71,8 +69,6 @@ public class ViewJanelas extends JFrame implements View {
         panelAddServicos.setEnderecos(enderecos);
     }
 
-    // ----- Agenda -----
-
     @Override
     public void setServicos(List<Servico> servicos) {
         panelTabela.setServicos(servicos);
@@ -93,8 +89,6 @@ public class ViewJanelas extends JFrame implements View {
         panelTabela.setAcaoRecarregar(acao);
     }
 
-    // ----- Mensagens -----
-
     @Override
     public void mostrarErro(String mensagem) {
         JOptionPane.showMessageDialog(janelaAtiva(), mensagem, "Erro", JOptionPane.ERROR_MESSAGE);
@@ -105,10 +99,6 @@ public class ViewJanelas extends JFrame implements View {
         JOptionPane.showMessageDialog(janelaAtiva(), mensagem, "Informação", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    /**
-     * Mostra a mensagem em cima da janela que o usuário está usando
-     * (por exemplo, a janela de detalhes), e não sempre da janela principal.
-     */
     private Window janelaAtiva() {
         Window ativa = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
         return ativa != null ? ativa : this;

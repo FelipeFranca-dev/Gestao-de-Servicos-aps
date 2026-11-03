@@ -1,6 +1,3 @@
--- Banco do projeto (3 tabelas). Rode uma vez no MySQL/phpMyAdmin em quem ainda não tem o banco.
--- Como usa "IF NOT EXISTS", não mexe em tabelas que já existem.
-
 CREATE DATABASE IF NOT EXISTS aps_servicos
     CHARACTER SET utf8mb4
     COLLATE utf8mb4_unicode_ci;
@@ -21,7 +18,6 @@ CREATE TABLE IF NOT EXISTS dados_servicos (
     observacoes  TEXT
     );
 
--- Liga o cliente ao serviço (um serviço pertence a um cliente).
 CREATE TABLE IF NOT EXISTS clientes_servicos (
                                                  id_clientes  INT NOT NULL,
                                                  id_servicos  INT NOT NULL,

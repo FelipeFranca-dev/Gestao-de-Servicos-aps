@@ -12,16 +12,6 @@ import dao.Dao;
 import dao.DaoException;
 import entities.Servico;
 
-/**
- * Guarda os serviços em files/servicos.csv.
- *
- * Formato (UTF-8, separado por ponto e vírgula):
- *   id;cliente;tipo;endereco;dd/MM/aaaa;status;observacoes
- *
- * Dentro dos campos, os caracteres especiais são "escapados":
- *   ";" vira "\;"   |   quebra de linha vira "\n"   |   "\" vira "\\"
- * Assim uma observação com ";" ou com várias linhas não quebra o arquivo.
- */
 public class DaoCsv implements Dao {
 
 	public static final String FILE_PATH_STRING = "servicos.csv";
@@ -66,7 +56,7 @@ public class DaoCsv implements Dao {
 			try {
 				servicos.add(paraServico(linha));
 			} catch (RuntimeException e) {
-				// uma linha estragada não pode derrubar o programa nem esconder as outras
+
 				System.err.println("Linha " + (i + 1) + " de " + FILE_PATH_STRING
 						+ " ignorada (" + e.getMessage() + "): " + linha);
 			}
@@ -120,10 +110,6 @@ public class DaoCsv implements Dao {
 		}
 	}
 
-	// ---------------------------------------------------------------
-	// Leitura e escrita de linhas
-	// ---------------------------------------------------------------
-
 	private void salvarTodos(List<Servico> servicos) {
 		List<String> linhas = new ArrayList<>();
 		for (Servico s : servicos) {
@@ -167,18 +153,13 @@ public class DaoCsv implements Dao {
 				case '\\': sb.append("\\\\"); break;
 				case SEPARADOR: sb.append("\\;"); break;
 				case '\n': sb.append("\\n"); break;
-				case '\r': break; // descarta (Windows manda \r\n)
+				case '\r': break;
 				default: sb.append(c);
 			}
 		}
 		return sb.toString();
 	}
 
-	/**
-	 * Divide a linha nos ";" que NÃO estão escapados e já desfaz o escape.
-	 * Diferente de linha.split(";"), mantém campos vazios no final
-	 * (uma observação vazia não faz mais o serviço sumir).
-	 */
 	private static List<String> separarCampos(String linha) {
 		List<String> campos = new ArrayList<>();
 		StringBuilder atual = new StringBuilder();

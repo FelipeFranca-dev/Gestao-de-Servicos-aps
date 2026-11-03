@@ -17,7 +17,6 @@ public class Controller {
 		this.model = aModel;
 		this.view = aView;
 
-		// liga as ações da tela a métodos do controller
 		view.addAcaoSalvarServico(e -> cadastrarServico());
 		view.setAcaoEditarServico(this::editarServico);
 		view.setAcaoExcluirServico(this::excluirServico);
@@ -26,7 +25,6 @@ public class Controller {
 		recarregar();
 	}
 
-	/** Busca tudo no DAO e atualiza a tabela e as listas dos combos. */
 	private void recarregar() {
 		try {
 			view.setServicos(model.getTodosServicos());
@@ -42,7 +40,6 @@ public class Controller {
 		String cliente = view.getClienteSelecionado();
 		String tipo = view.getTipoServico();
 		String endereco = view.getEndereco();
-
 		if (vazio(cliente)) {
 			view.mostrarErro("Selecione um cliente (ou use \"Novo cliente\").");
 			return;
@@ -55,7 +52,6 @@ public class Controller {
 			view.mostrarErro("Selecione um endereço (ou use \"Novo endereço\").");
 			return;
 		}
-
 		LocalDate data;
 		try {
 			data = LocalDate.parse(view.getData(), Servico.FORMATO_DATA);
@@ -79,7 +75,6 @@ public class Controller {
 		view.mostrarMensagem("Serviço cadastrado! (id " + novo.getId() + ")");
 	}
 
-	/** @return true se salvou com sucesso */
 	private boolean editarServico(Servico servico) {
 		try {
 			model.atualizaServico(servico);
@@ -91,7 +86,6 @@ public class Controller {
 		return true;
 	}
 
-	/** @return true se excluiu com sucesso */
 	private boolean excluirServico(Servico servico) {
 		try {
 			model.removeServicoById(servico.getId());

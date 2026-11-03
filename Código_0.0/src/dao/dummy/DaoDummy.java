@@ -9,7 +9,6 @@ import dao.Dao;
 import dao.DaoException;
 import entities.Servico;
 
-/** DAO em memória: os dados somem quando o programa fecha. Bom para testar a tela. */
 public class DaoDummy implements Dao {
 
 	private final TreeMap<Integer, Servico> servicos = new TreeMap<>();

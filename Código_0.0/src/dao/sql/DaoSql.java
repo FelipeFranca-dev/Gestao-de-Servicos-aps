@@ -14,26 +14,12 @@ import dao.Dao;
 import dao.DaoException;
 import entities.Servico;
 
-/**
- * DAO para MySQL, usando as 3 tabelas do banco "aps_servicos":
- *
- *   clientes           (id, nome)
- *   dados_servicos     (id, tipo, endereco, data, status, observacoes)
- *   clientes_servicos  (id_clientes, id_servicos)   <- liga o cliente ao serviço
- *
- * Por padrão conecta em localhost:3306, banco "aps_servicos", usuário "root", sem senha.
- * Para mudar sem mexer no código, defina variáveis de ambiente:
- *   GS_DB_URL, GS_DB_USER, GS_DB_PASS
- * (o .jar do mysql-connector-j precisa estar no classpath)
- */
 public class DaoSql implements Dao {
 
 	private static final String URL = config("GS_DB_URL", "jdbc:mysql://localhost:3306/aps_servicos");
 	private static final String USER = config("GS_DB_USER", "root");
 	private static final String PASS = config("GS_DB_PASS", "");
 
-	// Junta os três "cadernos": o serviço, a ligação e o nome do cliente.
-	// LEFT JOIN: se algum serviço estiver sem cliente ligado, ele ainda aparece (com nome vazio).
 	private static final String SELECT_SERVICOS =
 			"SELECT d.id, COALESCE(c.nome, '') AS cliente, d.tipo, d.endereco, "
 					+ "d.`data` AS data_servico, d.`status` AS status_servico, d.observacoes "
@@ -50,7 +36,6 @@ public class DaoSql implements Dao {
 		return DriverManager.getConnection(URL, USER, PASS);
 	}
 
-	/** Retorna true se conseguiu conectar. Útil para avisar o usuário logo na abertura. */
 	public static boolean testaConnection() {
 		try (Connection c = abreConexao()) {
 			System.out.println("Conexão com o banco estabelecida.");
@@ -85,7 +70,6 @@ public class DaoSql implements Dao {
 		try (Connection c = abreConexao();
 			 PreparedStatement s = c.prepareStatement(query)) {
 
-			// escapa \ % _ para que o usuário digitando "50%" não vire curinga
 			String termo = nomeCliente.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
 			s.setString(1, "%" + termo + "%");
 
@@ -102,7 +86,6 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	/** Lista só os clientes que têm pelo menos um serviço (quem ficou sem serviço some da lista). */
 	@Override
 	public List<String> getClientes() {
 		final String query = "SELECT DISTINCT c.nome FROM clientes c "
@@ -123,10 +106,6 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	/**
-	 * Cadastrar um serviço mexe em 3 tabelas. Tudo acontece numa "transação":
-	 * ou grava os três passos, ou não grava nada (rollback).
-	 */
 	@Override
 	public void addServico(Servico servico) {
 		try (Connection c = abreConexao()) {
@@ -136,7 +115,7 @@ public class DaoSql implements Dao {
 				int idServico = insereServico(c, servico);
 				ligaClienteAoServico(c, idCliente, idServico);
 				c.commit();
-				servico.setId(idServico); // devolve o id que o banco gerou
+				servico.setId(idServico); 
 			} catch (SQLException | RuntimeException e) {
 				c.rollback();
 				throw e;
@@ -146,7 +125,6 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	/** Atualiza os dados do serviço. O cliente ligado a ele não muda por aqui. */
 	@Override
 	public void atualizaServico(Servico servico) {
 		final String query = "UPDATE dados_servicos SET tipo=?, endereco=?, `data`=?, "
@@ -164,16 +142,11 @@ public class DaoSql implements Dao {
 			if (s.executeUpdate() == 0) {
 				throw new DaoException("Serviço não encontrado (id " + servico.getId() + ").");
 			}
-
 		} catch (SQLException e) {
 			throw new DaoException("Erro ao atualizar serviço: " + e.getMessage(), e);
 		}
 	}
 
-	/**
-	 * Apaga a ligação e depois o serviço. Se o cliente ficou sem nenhum outro serviço,
-	 * ele também é apagado (para poder ser cadastrado de novo, com outro serviço).
-	 */
 	@Override
 	public void removeServicoById(int id) {
 		try (Connection c = abreConexao()) {
@@ -191,7 +164,6 @@ public class DaoSql implements Dao {
 					}
 				}
 
-				// 2) apaga a ligação e o serviço
 				try (PreparedStatement s = c.prepareStatement(
 						"DELETE FROM clientes_servicos WHERE id_servicos=?")) {
 					s.setInt(1, id);
@@ -203,7 +175,6 @@ public class DaoSql implements Dao {
 					s.executeUpdate();
 				}
 
-				// 3) se o cliente não tem mais nenhum serviço, apaga o cliente também
 				if (idCliente != -1) {
 					try (PreparedStatement s = c.prepareStatement(
 							"DELETE FROM clientes WHERE id=? AND NOT EXISTS "
@@ -223,9 +194,6 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	// ---------- passos pequenos usados pelo addServico ----------
-
-	/** Procura o cliente pelo nome. Se não existir, cadastra. Devolve o id dele. */
 	private static int buscaOuCriaCliente(Connection c, String nome) throws SQLException {
 		String nomeLimpo = nome.trim();
 
@@ -252,7 +220,6 @@ public class DaoSql implements Dao {
 		throw new SQLException("Não foi possível obter o id do cliente \"" + nomeLimpo + "\".");
 	}
 
-	/** Grava os dados do serviço e devolve o id gerado pelo banco. */
 	private static int insereServico(Connection c, Servico servico) throws SQLException {
 		final String query = "INSERT INTO dados_servicos(tipo, endereco, `data`, `status`, observacoes) "
 				+ "VALUES(?, ?, ?, ?, ?)";
@@ -273,7 +240,6 @@ public class DaoSql implements Dao {
 		throw new SQLException("Não foi possível obter o id do serviço cadastrado.");
 	}
 
-	/** Escreve na tabela clientes_servicos: "este cliente contratou este serviço". */
 	private static void ligaClienteAoServico(Connection c, int idCliente, int idServico) throws SQLException {
 		try (PreparedStatement s = c.prepareStatement(
 				"INSERT INTO clientes_servicos(id_clientes, id_servicos) VALUES(?, ?)")) {
