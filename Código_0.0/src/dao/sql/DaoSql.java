@@ -102,10 +102,12 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	/** Lista os clientes direto da tabela clientes (inclusive os que ainda não têm serviço). */
+	/** Lista só os clientes que têm pelo menos um serviço (quem ficou sem serviço some da lista). */
 	@Override
 	public List<String> getClientes() {
-		final String query = "SELECT nome FROM clientes ORDER BY nome";
+		final String query = "SELECT DISTINCT c.nome FROM clientes c "
+				+ "JOIN clientes_servicos cs ON cs.id_clientes = c.id "
+				+ "ORDER BY c.nome";
 		try (Connection c = abreConexao();
 			 Statement s = c.createStatement();
 			 ResultSet rs = s.executeQuery(query)) {
@@ -168,12 +170,28 @@ public class DaoSql implements Dao {
 		}
 	}
 
-	/** Apaga a ligação e depois o serviço. O cliente continua cadastrado. */
+	/**
+	 * Apaga a ligação e depois o serviço. Se o cliente ficou sem nenhum outro serviço,
+	 * ele também é apagado (para poder ser cadastrado de novo, com outro serviço).
+	 */
 	@Override
 	public void removeServicoById(int id) {
 		try (Connection c = abreConexao()) {
 			c.setAutoCommit(false);
 			try {
+				// 1) descobre de quem é o serviço, antes de apagar a ligação
+				int idCliente = -1;
+				try (PreparedStatement s = c.prepareStatement(
+						"SELECT id_clientes FROM clientes_servicos WHERE id_servicos=?")) {
+					s.setInt(1, id);
+					try (ResultSet rs = s.executeQuery()) {
+						if (rs.next()) {
+							idCliente = rs.getInt(1);
+						}
+					}
+				}
+
+				// 2) apaga a ligação e o serviço
 				try (PreparedStatement s = c.prepareStatement(
 						"DELETE FROM clientes_servicos WHERE id_servicos=?")) {
 					s.setInt(1, id);
@@ -183,6 +201,17 @@ public class DaoSql implements Dao {
 						"DELETE FROM dados_servicos WHERE id=?")) {
 					s.setInt(1, id);
 					s.executeUpdate();
+				}
+
+				// 3) se o cliente não tem mais nenhum serviço, apaga o cliente também
+				if (idCliente != -1) {
+					try (PreparedStatement s = c.prepareStatement(
+							"DELETE FROM clientes WHERE id=? AND NOT EXISTS "
+									+ "(SELECT 1 FROM clientes_servicos WHERE id_clientes=?)")) {
+						s.setInt(1, idCliente);
+						s.setInt(2, idCliente);
+						s.executeUpdate();
+					}
 				}
 				c.commit();
 			} catch (SQLException | RuntimeException e) {

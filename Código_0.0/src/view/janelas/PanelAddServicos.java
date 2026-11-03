@@ -1,17 +1,21 @@
 package view.janelas;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.awt.event.ActionListener;
 import java.util.List;
 import java.util.function.Consumer;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -55,50 +59,50 @@ public class PanelAddServicos extends JPanel {
 
     public PanelAddServicos() {
 
-        setLayout(new BorderLayout(10, 10));
-        setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        setLayout(new BorderLayout(0, 12));
+        setBorder(BorderFactory.createEmptyBorder(16, 20, 16, 20));
 
-        JPanel formulario = new JPanel();
-        formulario.setLayout(new BoxLayout(formulario, BoxLayout.Y_AXIS));
+        // ----- Título -----
+        JLabel titulo = new JLabel("Novo serviço");
+        titulo.setFont(titulo.getFont().deriveFont(Font.BOLD, 22f));
+        titulo.setForeground(new Color(31, 95, 168));
+        add(titulo, BorderLayout.NORTH);
 
-        JPanel clientePanel = criarSecao("Cliente");
-        clientePanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        clientePanel.add(new JLabel("Cliente:"));
-        clientePanel.add(clienteCombo);
-        clientePanel.add(novoClienteButton);
+        // ----- Cartão central (fundo branco com borda fina) -----
+        JPanel cartao = new JPanel(new GridBagLayout());
+        cartao.setBackground(Color.WHITE);
+        cartao.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(new Color(210, 215, 222)),
+                BorderFactory.createEmptyBorder(20, 20, 20, 20)));
 
-        JPanel tipoPanel = criarSecao("Tipo de serviço");
-        tipoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        tipoPanel.add(new JLabel("Tipo:"));
-        tipoPanel.add(tipoServicoCombo);
-        tipoPanel.add(novoTipoButton);
+        adicionaLinha(cartao, 0, "Cliente:", clienteCombo, novoClienteButton);
+        adicionaLinha(cartao, 1, "Tipo de serviço:", tipoServicoCombo, novoTipoButton);
+        adicionaLinha(cartao, 2, "Endereço:", enderecoCombo, novoEnderecoButton);
+        adicionaLinha(cartao, 3, "Data (dd/mm/aaaa):", dataField, null);
+        adicionaLinha(cartao, 4, "Status:", statusCombo, null);
 
-        JPanel enderecoPanel = criarSecao("Endereço do serviço");
-        enderecoPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
-        enderecoPanel.add(new JLabel("Endereço:"));
-        enderecoPanel.add(enderecoCombo);
-        enderecoPanel.add(novoEnderecoButton);
-
-        JPanel dadosPanel = criarSecao("Dados do serviço");
-        dadosPanel.setLayout(new GridLayout(0, 2, 8, 8));
-        dadosPanel.add(new JLabel("Data (dd/mm/aaaa):"));
-        dadosPanel.add(dataField);
-        dadosPanel.add(new JLabel("Status:"));
-        dadosPanel.add(statusCombo);
-
+        // Observações: a caixa cresce junto com a janela
         observacoesArea.setLineWrap(true);
         observacoesArea.setWrapStyleWord(true);
-        JPanel observacoesPanel = criarSecao("Observações");
-        observacoesPanel.add(new JScrollPane(observacoesArea), BorderLayout.CENTER);
 
-        formulario.add(clientePanel);
-        formulario.add(tipoPanel);
-        formulario.add(enderecoPanel);
-        formulario.add(dadosPanel);
-        formulario.add(observacoesPanel);
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridy = 5;
+        g.insets = new Insets(6, 6, 6, 6);
 
-        add(new JScrollPane(formulario), BorderLayout.CENTER);
+        g.gridx = 0;
+        g.anchor = GridBagConstraints.NORTHWEST;
+        cartao.add(new JLabel("Observações:"), g);
 
+        g.gridx = 1;
+        g.gridwidth = 2;
+        g.weightx = 1;
+        g.weighty = 1;
+        g.fill = GridBagConstraints.BOTH;
+        cartao.add(new JScrollPane(observacoesArea), g);
+
+        add(cartao, BorderLayout.CENTER);
+
+        // ----- Botões alinhados à direita -----
         JPanel botoesPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         botoesPanel.add(limparButton);
         botoesPanel.add(salvarButton);
@@ -112,10 +116,33 @@ public class PanelAddServicos extends JPanel {
         statusCombo.setSelectedIndex(0);
     }
 
-    private JPanel criarSecao(String titulo) {
-        JPanel panel = new JPanel(new BorderLayout(5, 5));
-        panel.setBorder(BorderFactory.createTitledBorder(titulo));
-        return panel;
+    /**
+     * Coloca uma linha no cartão: rótulo | campo | botão (opcional).
+     * Sem botão, o campo ocupa também a coluna do botão.
+     */
+    private void adicionaLinha(JPanel painel, int linha, String rotulo, JComponent campo, JButton botao) {
+        GridBagConstraints g = new GridBagConstraints();
+        g.gridy = linha;
+        g.insets = new Insets(6, 6, 6, 6);
+        g.anchor = GridBagConstraints.WEST;
+
+        g.gridx = 0;
+        painel.add(new JLabel(rotulo), g);
+
+        g.gridx = 1;
+        g.weightx = 1;
+        g.fill = GridBagConstraints.HORIZONTAL;
+        if (botao == null) {
+            g.gridwidth = 2;
+        }
+        painel.add(campo, g);
+
+        if (botao != null) {
+            g.gridx = 2;
+            g.gridwidth = 1;
+            g.weightx = 0;
+            painel.add(botao, g);
+        }
     }
 
     // Os botões "Novo ..." abrem um pequeno diálogo e adicionam o valor digitado ao combo.

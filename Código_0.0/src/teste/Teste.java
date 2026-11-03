@@ -10,6 +10,7 @@ import dao.DaoException;
 import dao.dao_csv.DaoCsv;
 import dao.dummy.DaoDummy;
 import dao.sql.DaoSql;
+import view.janelas.Tema;
 import view.janelas.ViewJanelas;
 
 /**
@@ -21,6 +22,7 @@ import view.janelas.ViewJanelas;
 public class Teste {
 
 	public static void main(String[] args) {
+		Tema.aplicar();
 		String modo = (args.length > 0) ? args[0].trim().toLowerCase() : "csv";
 
 		EventQueue.invokeLater(() -> {
